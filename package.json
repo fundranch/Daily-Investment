@@ -233,8 +233,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "wzk1583456343",
+      "repo": "Daily-Investment"
     }
   },
   "collective": {

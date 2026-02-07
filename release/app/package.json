@@ -1,12 +1,11 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "4.6.0",
-  "description": "A foundation for scalable desktop apps",
+  "name": "daily-investment",
+  "version": "1.0.0",
+  "description": "gold&fund",
   "license": "MIT",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "kk&&ff",
+    "url": "https://github.com/wzk1583456343"
   },
   "main": "./dist/main/main.js",
   "scripts": {

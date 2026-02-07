@@ -2,20 +2,20 @@ name: Publish
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
   publish:
     # To enable auto publishing to github, update your electron publisher
     # config in package.json > "build" and remove the conditional below
-    if: ${{ github.repository_owner == 'electron-react-boilerplate' }}
+    if: ${{ github.repository_owner == 'wzk1583456343' }}
 
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [macos-latest, windows-latest]
 
     steps:
       - name: Checkout git repo
@@ -44,4 +44,8 @@ jobs:
           # This is used for uploading release assets to github
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm exec electron-builder -- --publish always --win --mac --linux
+          if [ "${{ matrix.os }}" == "macos-latest" ]; then
+            npm exec electron-builder -- --publish always --mac
+          else
+            npm exec electron-builder -- --publish always --win
+          fi
