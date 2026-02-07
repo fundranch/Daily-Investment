@@ -1,0 +1,39 @@
+import { inject, injectable, postConstruct } from 'inversify';
+import 'reflect-metadata';
+import { ipcMain } from 'electron';
+import { StorageModule } from '../storage/fund-storage';
+import { PollingScheduler } from './scheduler';
+import { EventBus } from '../events';
+import { SYMBOLS } from '../../symbols';
+
+@injectable()
+export class PollingCore {
+    @inject(StorageModule) protected storageModule: StorageModule;
+
+    @inject(PollingScheduler) protected pollingScheduler: PollingScheduler;
+
+    @inject(SYMBOLS.EventBus) eventBus: EventBus;
+
+    @postConstruct()
+    init() {
+        ipcMain.on('refresh-polling', () => {
+            this.pollingScheduler.restart();
+        });
+        this.eventBus.on('storage-config-change', () => {
+            this.pollingScheduler.restart();
+        });
+    }
+
+    public async initialize() {
+        try {
+            await this.getPollingConfig();
+            this.pollingScheduler.start();
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    private async getPollingConfig() {
+        await this.storageModule.getAppData();
+    }
+}

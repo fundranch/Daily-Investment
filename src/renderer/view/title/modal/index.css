@@ -1,0 +1,18 @@
+.setting-modal  {
+    .ant-modal-mask {
+        backdrop-filter: unset;
+    }
+    .ant-modal-container  {
+        padding: 15px;
+        border-radius: 4px;
+    }
+    .ant-modal-title {
+        color: #333;
+        font-size: 13px;
+        height: 24px;
+    }
+    .ant-modal-close {
+        /* height: 24px;
+        width: 24px; */
+    }
+}
