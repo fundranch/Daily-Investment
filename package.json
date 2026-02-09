@@ -237,6 +237,7 @@
       "repo": "Daily-Investment"
     }
   },
+  "artifactName": "${productName}-${version}-${arch}.${ext}",
   "collective": {
     "url": "https://opencollective.com/electron-react-boilerplate-594"
   },
