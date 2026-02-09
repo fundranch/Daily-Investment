@@ -179,7 +179,11 @@
     "webpack-merge": "^6.0.1"
   },
   "build": {
-    "productName": "DailyInvestment",
+    "productName": "小金管家",
+    "artifactName": "daily-investment-${version}-${arch}.${ext}",
+    "extraMetadata": {
+        "name": "daily-investment"
+    },
     "appId": "org.erb.DailyInvestment",
     "asar": true,
     "afterSign": ".erb/scripts/notarize.js",
