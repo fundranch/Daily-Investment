@@ -7,41 +7,34 @@ on:
 
 jobs:
   publish:
-
-    runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
         os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Install Node and NPM
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 22
           cache: npm
 
-      - name: Install and build
-        run: |
+      - run: |
           npm install
           npm run postinstall
           npm run build
-      
-      # macOS 单独打 Mac 包
-      - name: Build Mac Releases
-        env:
-          # This is used for uploading release assets to github
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # macOS
+      - name: Build Mac
         if: matrix.os == 'macos-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm exec electron-builder -- --publish always --mac
 
-      # Windows 单独打 Windows 包
-      - name: Build Windows Releases
-        env:
-          # This is used for uploading release assets to github
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Windows
+      - name: Build Windows
         if: matrix.os == 'windows-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm exec electron-builder -- --publish always --win
