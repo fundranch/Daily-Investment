@@ -16,6 +16,7 @@ import { createWindow } from './modules/browser-window';
 import { container } from './container';
 import { SYMBOLS } from './symbols';
 import { PollingCore } from './modules/polling-scheduler/polling-core';
+import './modules/api';
 
 class AppUpdater {
     constructor() {
@@ -31,7 +32,7 @@ if(process.env.NODE_ENV === 'production') {
 }
 
 if(isDebug) {
-    require('electron-debug').default();
+    // require('electron-debug').default();
 }
 
 /**

@@ -1,7 +1,6 @@
 import { GetProp, Menu, MenuProps, Modal } from 'antd';
 import React, { forwardRef, useState } from 'react';
 import styled from 'styled-components';
-import './index.css';
 import { InfoCircleOutlined, SettingOutlined } from '@ant-design/icons';
 import { SetttingContent } from './SettingContent';
 

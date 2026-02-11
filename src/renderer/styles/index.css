@@ -1,4 +1,4 @@
-.setting-modal  {
+.setting-modal, .fund-modal  {
     .ant-modal-mask {
         backdrop-filter: unset;
     }
@@ -14,5 +14,8 @@
     .ant-modal-close {
         /* height: 24px;
         width: 24px; */
+    }
+    .ant-modal-footer .ant-btn {
+        font-size: 12px;
     }
 }

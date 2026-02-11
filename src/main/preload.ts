@@ -2,9 +2,9 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'composite-data-update' | 'metal-data-update' | 'chart-data-update' | 'select-chart-type' | 'refresh-polling';
+export type Channels = 'composite-data-update' | 'metal-data-update' | 'chart-data-update' | 'select-chart-type' | 'refresh-polling' | 'self-selected-fund-update' | 'hold-fund-update' | 'browser-context-menu';
 
-export type InvokeChannels = 'get-setting-data' | 'set-setting-data'
+export type InvokeChannels = 'get-setting-data' | 'set-setting-data' | 'fund-search' | 'change-self-selected-fund' | 'change-hold-fund'
 
 const electronHandler = {
     ipcRenderer: {

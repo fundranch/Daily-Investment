@@ -5,6 +5,8 @@ import { CompositeApi } from './apis/composite';
 import { MetalApi } from './apis/metal';
 import { MetalChartApi } from './apis/metal-chart';
 import { StorageModule } from '../storage/fund-storage';
+import { SelfSelectedFundApi } from './apis/self-selected-fund';
+import { HoldFundApi } from './apis/hold-fund';
 
 @injectable()
 export class PollingScheduler {
@@ -16,6 +18,9 @@ export class PollingScheduler {
 
     @inject(StorageModule) protected storageModule: StorageModule;
 
+    @inject(SelfSelectedFundApi) protected selfSelectedFundApi: SelfSelectedFundApi;
+
+    @inject(HoldFundApi) protected holdFundApi: HoldFundApi;
 
     @postConstruct()
     init() {
@@ -39,16 +44,17 @@ export class PollingScheduler {
     private timer: any | null = null;
 
     private get fetchers(): BaseApiFetcher[] {
+        const baseApi: BaseApiFetcher[] = [this.compositeApi, this.metalApi, this.selfSelectedFundApi, this.holdFundApi];
         if(this.chartTarget.type === 'metal')  {
-            return [this.compositeApi, this.metalApi, this.metalChartApi];
+            return baseApi.concat(this.metalChartApi);
         }
-        return [this.compositeApi, this.metalApi];
+        return baseApi;
     }
 
-    private async pollOnce() {
+    private async pollOnce(clean?: boolean) {
         try {
             await Promise.all(
-                this.fetchers.map(fetcher => fetcher.fetch(this.chartTarget.key))
+                this.fetchers.map(fetcher => fetcher.fetch({ key: this.chartTarget.key, clean }))
             );
         } catch(err: any) {
             if(err.name !== 'AbortError') {
@@ -59,15 +65,15 @@ export class PollingScheduler {
 
     public restart() {
         this.stop();
-        this.start();
+        this.start(true);
     }
 
-    public start() {
+    public start(clean?: boolean) {
         if(this.timer) return;
-        this.pollOnce();
+        this.pollOnce(clean);
         this.timer = setInterval(() => {
             console.log('>>>>循环', this.interval);
-            this.pollOnce();
+            this.pollOnce(clean);
         }, this.interval || 6 * 10000);
     }
 

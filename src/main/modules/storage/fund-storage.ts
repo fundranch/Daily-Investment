@@ -13,9 +13,10 @@ export class StorageModule {
     private fileName = 'fund.json';
 
     public data: StorageData | null = {
-        holdFunds: [],
+        holdFundsSource: {},
         interval: 5000,
-        optionalFunds: []
+        fundSource: 0,
+        selfSelectedFundsSource: {}
     };
 
     @postConstruct()
@@ -29,7 +30,7 @@ export class StorageModule {
         });
         ipcMain.handle('set-setting-data', async (event, data) => {
             const res = await this.setAppData(data);
-            this.eventBus.emit('storage-config-change');
+            this.eventBus.emit('polling-scheduler-restart');
             return res;
         });
     }

@@ -1,30 +1,37 @@
 import {
-    app,
     Menu,
-    shell,
     BrowserWindow,
     MenuItemConstructorOptions,
+    ipcMain,
+    app,
 } from 'electron';
+import { inject, injectable } from 'inversify';
+import { SYMBOLS } from '../../symbols';
+import { SelfSelectedFundDbService } from '../db/self-selected-fund-db';
+import { PollingScheduler } from '../polling-scheduler/scheduler';
+import { HoldFundDbService } from '../db/hold-fund-db';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
   submenu?: DarwinMenuItemConstructorOptions[] | Menu;
 }
 
-export default class MenuBuilder {
-    mainWindow: BrowserWindow;
+@injectable()
+export class MenuBuilder {
+    @inject(SYMBOLS.MainBrowserFactory) mainBrowserFactory: () => BrowserWindow;
 
-    constructor(mainWindow: BrowserWindow) {
-        this.mainWindow = mainWindow;
+    @inject(SelfSelectedFundDbService) private selfSelectedFundDbService: SelfSelectedFundDbService;
+
+    @inject(HoldFundDbService) private holdFundDbService: HoldFundDbService;
+
+    @inject(PollingScheduler) private pollingScheduler:PollingScheduler;
+
+    protected get mainWindow() {
+        return this.mainBrowserFactory();
     }
 
-    buildMenu(): Menu {
-        if(
-            process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-        ) {
-            this.setupDevelopmentEnvironment();
-        }
+    public buildMenu(): Menu {
+        this.setupContextMenu();
 
         const template =
       process.platform === 'darwin'
@@ -37,254 +44,192 @@ export default class MenuBuilder {
         return menu;
     }
 
-    setupDevelopmentEnvironment(): void {
-        this.mainWindow.webContents.on('context-menu', (_, props) => {
-            const { x, y } = props;
-
-            Menu.buildFromTemplate([
-                {
-                    label: 'Inspect element',
-                    click: () => {
-                        this.mainWindow.webContents.inspectElement(x, y);
-                    },
-                },
-            ]).popup({ window: this.mainWindow });
+    private setupContextMenu(): void {
+        ipcMain.on('browser-context-menu', (event, type: string, ext: Record<string, any>) => {
+            if(event.sender !== this.mainWindow.webContents) return;
+            if(type === 'self-selected-fund') {
+                this.setSelfSelectedFundMenu(ext);
+            }
+            if(type === 'hold-fund') {
+                this.setHoldFundMenu(ext);
+            }
         });
     }
 
+    // 自选基金右键菜单
+    private setSelfSelectedFundMenu(options: Record<string, any>) {
+        Menu.buildFromTemplate([
+            {
+                label: '删除自选',
+                click: () => {
+                    const res = this.selfSelectedFundDbService.deleteFund(options.code);
+                    if(!res) return;
+                    this.pollingScheduler.restart();
+                }
+            },
+            {
+                label: '置顶',
+                click: () => {
+                    const res = this.selfSelectedFundDbService.fundToTop(options.code);
+                    if(!res) return;
+                    this.pollingScheduler.restart();
+                }
+            }
+        ]).popup({ window: this.mainWindow });
+    }
+
+    // 持有基金右键菜单
+    private setHoldFundMenu(options: Record<string, any>) {
+        Menu.buildFromTemplate([
+            {
+                label: '更新持有',
+                click: () => {
+                    // TODO
+                }
+            },
+            {
+                label: '删除持有',
+                click: () => {
+                    const res = this.holdFundDbService.deleteFund(options.code);
+                    if(!res) return;
+                    this.pollingScheduler.restart();
+                }
+            },
+            {
+                label: '置顶',
+                click: () => {
+                    const res = this.holdFundDbService.fundToTop(options.code);
+                    if(!res) return;
+                    this.pollingScheduler.restart();
+                }
+            }
+        ]).popup({ window: this.mainWindow });
+    }
+
     buildDarwinTemplate(): MenuItemConstructorOptions[] {
-        const subMenuAbout: DarwinMenuItemConstructorOptions = {
-            label: 'Electron',
+        const subMenuMain: DarwinMenuItemConstructorOptions = {
+            label: '小金管家',
             submenu: [
                 {
-                    label: 'About ElectronReact',
-                    selector: 'orderFrontStandardAboutPanel:',
+                    label: '关于',
+                    click: () => {
+                    }
                 },
                 { type: 'separator' },
-                { label: 'Services', submenu: [] },
-                { type: 'separator' },
                 {
-                    label: 'Hide ElectronReact',
+                    label: '隐藏',
                     accelerator: 'Command+H',
                     selector: 'hide:',
                 },
-                {
-                    label: 'Hide Others',
-                    accelerator: 'Command+Shift+H',
-                    selector: 'hideOtherApplications:',
-                },
-                { label: 'Show All', selector: 'unhideAllApplications:' },
                 { type: 'separator' },
                 {
-                    label: 'Quit',
+                    label: '退出',
                     accelerator: 'Command+Q',
                     click: () => {
                         app.quit();
                     },
-                },
-            ],
+                }
+            ]
         };
-        const subMenuEdit: DarwinMenuItemConstructorOptions = {
-            label: 'Edit',
+        const subMenuView: DarwinMenuItemConstructorOptions = {
+            label: '视图',
             submenu: [
-                { label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
-                { label: 'Redo', accelerator: 'Shift+Command+Z', selector: 'redo:' },
+                {
+                    label: '数据刷新',
+                    accelerator: 'Command+F',
+                    click: () => {
+                        this.pollingScheduler.restart();
+                    }
+                },
                 { type: 'separator' },
-                { label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
-                { label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
-                { label: 'Paste', accelerator: 'Command+V', selector: 'paste:' },
                 {
-                    label: 'Select All',
-                    accelerator: 'Command+A',
-                    selector: 'selectAll:',
-                },
-            ],
-        };
-        const subMenuViewDev: MenuItemConstructorOptions = {
-            label: 'View',
-            submenu: [
-                {
-                    label: 'Reload',
+                    label: '视图刷新',
                     accelerator: 'Command+R',
                     click: () => {
                         this.mainWindow.webContents.reload();
-                    },
+                    }
                 },
                 {
-                    label: 'Toggle Full Screen',
+                    label: '全屏',
                     accelerator: 'Ctrl+Command+F',
                     click: () => {
                         this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
                     },
                 },
                 {
-                    label: 'Toggle Developer Tools',
-                    accelerator: 'Alt+Command+I',
+                    label: '检查',
+                    visible: process.env.NODE_ENV === 'development',
+                    accelerator: 'Command+Shift+I',
                     click: () => {
                         this.mainWindow.webContents.toggleDevTools();
-                    },
-                },
-            ],
+                    }
+                }
+            ]
         };
-        const subMenuViewProd: MenuItemConstructorOptions = {
-            label: 'View',
-            submenu: [
-                {
-                    label: 'Toggle Full Screen',
-                    accelerator: 'Ctrl+Command+F',
-                    click: () => {
-                        this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
-                    },
-                },
-            ],
-        };
-        const subMenuWindow: DarwinMenuItemConstructorOptions = {
-            label: 'Window',
-            submenu: [
-                {
-                    label: 'Minimize',
-                    accelerator: 'Command+M',
-                    selector: 'performMiniaturize:',
-                },
-                { label: 'Close', accelerator: 'Command+W', selector: 'performClose:' },
-                { type: 'separator' },
-                { label: 'Bring All to Front', selector: 'arrangeInFront:' },
-            ],
-        };
-        const subMenuHelp: MenuItemConstructorOptions = {
-            label: 'Help',
-            submenu: [
-                {
-                    label: 'Learn More',
-                    click() {
-                        shell.openExternal('https://electronjs.org');
-                    },
-                },
-                {
-                    label: 'Documentation',
-                    click() {
-                        shell.openExternal(
-                            'https://github.com/electron/electron/tree/main/docs#readme',
-                        );
-                    },
-                },
-                {
-                    label: 'Community Discussions',
-                    click() {
-                        shell.openExternal('https://www.electronjs.org/community');
-                    },
-                },
-                {
-                    label: 'Search Issues',
-                    click() {
-                        shell.openExternal('https://github.com/electron/electron/issues');
-                    },
-                },
-            ],
-        };
-
-        const subMenuView =
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-          ? subMenuViewDev
-          : subMenuViewProd;
-
-        return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+        return [subMenuMain, subMenuView];
     }
 
     buildDefaultTemplate() {
-        const templateDefault = [
-            {
-                label: '&File',
-                submenu: [
-                    {
-                        label: '&Open',
-                        accelerator: 'Ctrl+O',
+        const templateDefault: MenuItemConstructorOptions = {
+            label: '小金管家',
+            submenu: [
+                {
+                    label: '关于',
+                    click: () => {
+                    }
+                },
+                { type: 'separator' },
+                {
+                    label: '隐藏',
+                    accelerator: 'Command+H',
+                },
+                { type: 'separator' },
+                {
+                    label: '退出',
+                    accelerator: 'Command+Q',
+                    click: () => {
+                        app.quit();
                     },
-                    {
-                        label: '&Close',
-                        accelerator: 'Ctrl+W',
-                        click: () => {
-                            this.mainWindow.close();
-                        },
-                    },
-                ],
-            },
-            {
-                label: '&View',
-                submenu:
-          process.env.NODE_ENV === 'development' ||
-          process.env.DEBUG_PROD === 'true'
-              ? [
-                  {
-                      label: '&Reload',
-                      accelerator: 'Ctrl+R',
-                      click: () => {
-                          this.mainWindow.webContents.reload();
-                      },
-                  },
-                  {
-                      label: 'Toggle &Full Screen',
-                      accelerator: 'F11',
-                      click: () => {
-                          this.mainWindow.setFullScreen(
-                              !this.mainWindow.isFullScreen(),
-                          );
-                      },
-                  },
-                  {
-                      label: 'Toggle &Developer Tools',
-                      accelerator: 'Alt+Ctrl+I',
-                      click: () => {
-                          this.mainWindow.webContents.toggleDevTools();
-                      },
-                  },
-              ]
-              : [
-                  {
-                      label: 'Toggle &Full Screen',
-                      accelerator: 'F11',
-                      click: () => {
-                          this.mainWindow.setFullScreen(
-                              !this.mainWindow.isFullScreen(),
-                          );
-                      },
-                  },
-              ],
-            },
-            {
-                label: 'Help',
-                submenu: [
-                    {
-                        label: 'Learn More',
-                        click() {
-                            shell.openExternal('https://electronjs.org');
-                        },
-                    },
-                    {
-                        label: 'Documentation',
-                        click() {
-                            shell.openExternal(
-                                'https://github.com/electron/electron/tree/main/docs#readme',
-                            );
-                        },
-                    },
-                    {
-                        label: 'Community Discussions',
-                        click() {
-                            shell.openExternal('https://www.electronjs.org/community');
-                        },
-                    },
-                    {
-                        label: 'Search Issues',
-                        click() {
-                            shell.openExternal('https://github.com/electron/electron/issues');
-                        },
-                    },
-                ],
-            },
-        ];
+                }
+            ]
+        };
 
-        return templateDefault;
+        const subMenuView: DarwinMenuItemConstructorOptions = {
+            label: '视图',
+            submenu: [
+                {
+                    label: '数据刷新',
+                    accelerator: 'Command+F',
+                    click: () => {
+                        this.pollingScheduler.restart();
+                    }
+                },
+                { type: 'separator' },
+                {
+                    label: '视图刷新',
+                    accelerator: 'Command+R',
+                    click: () => {
+                        this.mainWindow.webContents.reload();
+                    }
+                },
+                {
+                    label: '全屏',
+                    accelerator: 'Ctrl+Command+F',
+                    click: () => {
+                        this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
+                    },
+                },
+                {
+                    label: '检查',
+                    visible: process.env.NODE_ENV === 'development',
+                    accelerator: 'Command+Shift+I',
+                    click: () => {
+                        this.mainWindow.webContents.toggleDevTools();
+                    }
+                }
+            ]
+        };
+
+        return [templateDefault, subMenuView];
     }
 }

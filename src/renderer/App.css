@@ -11,6 +11,10 @@ body, html, #root {
 * {
     box-sizing: border-box;
 }
+*::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
 .box {
     background-color: #fff;
     padding: 10px;

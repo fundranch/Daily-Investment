@@ -20,9 +20,6 @@ const Wrapper = styled.div`
         grid-template-columns: 3fr 2fr;
         gap: 15px;
         overflow-y: auto;
-        &::-webkit-scrollbar {
-            width: 0;
-        }
         .left, .right {
             height: 100%;
             min-width: 0;
@@ -44,7 +41,7 @@ export default function App() {
         window.electron.ipcRenderer.invoke('get-setting-data').then((data) => {
             setConfigData(data);
         }).catch((e) => { console.error(e); });
-        
+
         return () => {
             // pollingScheduler.stop();
         };
@@ -70,6 +67,14 @@ export default function App() {
                         optionFontSize: 12,
                         optionHeight: 24,
                         optionPadding: '4px 10px'
+                    },
+                    Tabs: {
+                        horizontalItemGutter: 15
+                    },
+                    Table: {
+                        headerBg: '#fff',
+                        headerColor: '#aeaeae',
+                        cellFontSizeSM: 10
                     }
                 }
             }}

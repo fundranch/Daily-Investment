@@ -2,6 +2,8 @@ import { inject, injectable } from 'inversify';
 import { BrowserWindow } from 'electron';
 import { SYMBOLS } from '../../../symbols';
 
+export type Options = { clean?: boolean, [x: string]: any }
+
 @injectable()
 export abstract class BaseApiFetcher {
 
@@ -22,7 +24,7 @@ export abstract class BaseApiFetcher {
         this.abortController = new AbortController();
     }
 
-    public fetch(key?: string) {
+    public fetch(options?: Options) {
         this.cancelIfRunning();
     };
 

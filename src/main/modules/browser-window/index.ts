@@ -3,7 +3,7 @@ import path from 'path';
 import { isDebug } from '../env';
 import { installExtensions } from '../extensions';
 import { resolveHtmlPath } from '../../util';
-import MenuBuilder from '../menu';
+import { MenuBuilder } from '../menu';
 import '../polling-scheduler';
 import { container } from '../../container';
 import { SYMBOLS } from '../../symbols';
@@ -60,7 +60,7 @@ export async function createWindow() {
         mainWindow = null;
     });
     
-    const menuBuilder = new MenuBuilder(mainWindow);
+    const menuBuilder = container.get(MenuBuilder);
     menuBuilder.buildMenu();
     
     // Open urls in the user's browser

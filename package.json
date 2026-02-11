@@ -33,6 +33,7 @@
     "lint:fix": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never && npm run build:dll",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
+    "rebuild:sqlite": "npx @electron/rebuild -f -w better-sqlite3 --electron-version 35.0.2",
     "prestart": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true NODE_OPTIONS=\"-r ts-node/register --no-warnings\" webpack --config ./.erb/configs/webpack.config.main.dev.ts",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run prestart && npm run start:renderer",
     "start:main": "concurrently -k -P \"cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --watch --config ./.erb/configs/webpack.config.main.dev.ts\" \"electronmon . -- {@}\" --",
@@ -96,6 +97,8 @@
     "@ant-design/icons": "^6.1.0",
     "@electron/notarize": "^3.0.0",
     "antd": "^6.2.3",
+    "better-sqlite3": "^12.6.2",
+    "cheerio": "^1.2.0",
     "dayjs": "^1.11.19",
     "echarts": "^6.0.0",
     "electron-debug": "^4.1.0",
@@ -118,6 +121,7 @@
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/echarts": "^4.9.22",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.23",
@@ -158,6 +162,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "mini-css-extract-plugin": "^2.9.2",
+    "node-abi": "^4.26.0",
     "prettier": "^3.5.3",
     "react-refresh": "^0.16.0",
     "react-test-renderer": "^19.0.0",
@@ -182,7 +187,7 @@
     "productName": "小金管家",
     "artifactName": "daily-investment-${version}-${arch}.${ext}",
     "extraMetadata": {
-        "name": "daily-investment"
+      "name": "daily-investment"
     },
     "appId": "org.erb.DailyInvestment",
     "asar": true,

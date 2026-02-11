@@ -19,7 +19,7 @@ export class PollingCore {
         ipcMain.on('refresh-polling', () => {
             this.pollingScheduler.restart();
         });
-        this.eventBus.on('storage-config-change', () => {
+        this.eventBus.on('polling-scheduler-restart', () => {
             this.pollingScheduler.restart();
         });
     }
