@@ -34,7 +34,7 @@ const Wrapper = styled.div`
 `;
 
 export function SetttingContent(props: Props) {
-    const [form] = Form.useForm<{interval: number}>();
+    const [form] = Form.useForm<{interval: number, fundSource: 0 | 1}>();
 
     const [loading, setLoading] = useState(false);
 
@@ -42,7 +42,10 @@ export function SetttingContent(props: Props) {
     const setConfigData = useConfigStore(state => state.setData);
 
     useEffect(() => {
-        form.setFieldValue('interval', configData.interval);
+        form.setFieldsValue({
+            interval: configData.interval,
+            fundSource: configData.fundSource
+        });
     }, [configData]);
 
     function handleCancel() {
@@ -51,7 +54,6 @@ export function SetttingContent(props: Props) {
 
     async function handleConfirm() {
         const formData = form.getFieldsValue();
-        if(formData.interval === configData.interval) return;
         setLoading(true);
         try {
             const res = await window.electron.ipcRenderer.invoke('set-setting-data', { ...formData });
@@ -65,17 +67,25 @@ export function SetttingContent(props: Props) {
     }
 
     return <Wrapper>
-        <Form form={form} size='small'>
-            <Form.Item name="interval" label="轮训间隔" layout='horizontal'>
+        <Form form={form} size='small' layout='horizontal' labelCol={{ span: 5 }}>
+            <Form.Item name="interval" label="轮训间隔">
                 <Select
-                    style={{ width: 100, height: 20, fontSize: 10 }}
+                    style={{ width: 200, height: 20, fontSize: 10 }}
                     options={[
-                        { label: '每半秒', value: 500 },
                         { label: '每秒', value: 1000 },
                         { label: '每5秒', value: 1000 * 5 },
-                        { label: '每半分', value: 1000 * 30 },
+                        { label: '每10秒', value: 1000 * 10 },
+                        { label: '每30秒', value: 1000 * 30 },
                         { label: '每分', value: 1000 * 60 },
                         { label: '每5分', value: 1000 * 60 * 5 },
+                    ]}/>
+            </Form.Item>
+            <Form.Item name="fundSource" label="基金数据源">
+                <Select
+                    style={{ width: 200, height: 20, fontSize: 10 }}
+                    options={[
+                        { label: '数据源1（基金速查网）', value: 0 },
+                        { label: '数据源2（东方财富）', value: 1 }
                     ]}/>
             </Form.Item>
         </Form>

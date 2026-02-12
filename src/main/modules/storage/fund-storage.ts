@@ -15,7 +15,7 @@ export class StorageModule {
     public data: StorageData | null = {
         holdFundsSource: {},
         interval: 5000,
-        fundSource: 0,
+        fundSource: 1,
         selfSelectedFundsSource: {}
     };
 

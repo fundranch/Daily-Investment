@@ -125,7 +125,7 @@ export function HoldFundTable() {
             align: 'right',
             width: 80,
             render(value, record) {
-                return <ValueColumns status={record.status} value={value} time={record.estimateTime} />;
+                return <ValueColumns status={record.status} value={value} time={record.netTime} />;
             }
         }
     ];

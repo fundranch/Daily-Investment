@@ -15,12 +15,17 @@ export async function handleFundEstimateDataSource_0(target: Response): Promise<
     try {
         const text = await target.text();
         const split = text.split('|');
+        const netTime = split[0];
+        const net = split[1];
+        const estimateTime = split[9];
+        const estimateNet = netTime === estimateTime ? net : split[7];
+        const estimateChange = netTime === estimateTime ? split[4] : split[5];
         return {
-            netTime: split[0], // 最新净值时间
-            net: split[1], // 最新净值
-            estimateNet: split[7], // 预估净值
-            estimateChange: split[5], // 预估涨跌幅
-            estimateTime: split[9],
+            netTime, // 最新净值时间
+            net, // 最新净值
+            estimateNet, // 预估净值
+            estimateChange, // 预估涨跌幅
+            estimateTime,
             updateTime: split[10]
         };
     } catch(e) {
@@ -29,8 +34,26 @@ export async function handleFundEstimateDataSource_0(target: Response): Promise<
 }
 
 // 处理数据源2的基金数据
-export function handleFundEstimateDataSource_1() {
-    return null;
+export async function handleFundEstimateDataSource_1(target: Response) : Promise<Partial<BaseFundData> | null>  {
+    try {
+        const text = await target.text();
+        // {"fundcode":"012886","name":"华夏中证光伏产业ETF发起式联接C","jzrq":"2026-02-10","dwjz":"0.7028","gsz":"0.6963","gszzl":"-0.93","gztime":"2026-02-11 15:00"}
+        const json = text.match(/^jsonpgz\((.*)\);$/)?.[1];
+        if(!json) return null;
+        const data = JSON.parse(json);
+        const timeSplit = data.gztime.split(' ');
+        return {
+            netTime: data.jzrq, // 最新净值时间
+            net: data.dwjz, // 最新净值
+            estimateNet: data.gsz, // 预估净值
+            estimateChange: `${data.gszzl}%`, // 预估涨跌幅
+            estimateTime: timeSplit[0],
+            updateTime: timeSplit[1]
+        };
+    } catch(e) {
+        console.log('eeeee', e);
+        return null;
+    }
 }
 
 // 获取状态
