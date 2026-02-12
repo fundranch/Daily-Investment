@@ -97,7 +97,6 @@
     "@ant-design/icons": "^6.1.0",
     "@electron/notarize": "^3.0.0",
     "antd": "^6.2.3",
-    "better-sqlite3": "^12.6.2",
     "cheerio": "^1.2.0",
     "dayjs": "^1.11.19",
     "echarts": "^6.0.0",
