@@ -25,6 +25,10 @@ export class MetalChartApi extends BaseApiFetcher {
 
     public async fetch(options: Options) {
         super.fetch();
+        if(options.key === 'aums') {
+            this.mainBrowser?.webContents.send('chart-data-update', { data: [], key: options.key });
+            return;
+        }
         try {
             const res = await fetch(this.getSource(options.key as any), { signal: this.abortController?.signal, headers: FAKE_HEADERS });
             const text = await res.text();

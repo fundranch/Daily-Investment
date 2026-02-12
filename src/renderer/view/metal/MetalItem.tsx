@@ -7,14 +7,14 @@ import { getColorByStatus } from '../../utils/color';
 import { useChartStore } from '../../store/chart';
 
 interface Props {
-    type: 'au' | 'ag' | 'aum'
+    type: 'au' | 'ag' | 'aum' | 'aums'
 }
 
 const Wrapper = styled.div<{color: string}>`
     cursor: pointer;
     height: 100%;
-    min-width: 200px;
-    flex: 1 0 100px;
+    min-width: 220px;
+    flex: 1 0 220px;
     overflow: hidden;
     font-weight: bold;
     display: flex;
@@ -82,9 +82,6 @@ export function MetalItem(props: Props) {
     const metalData = useMetalStore(state => state.data[props.type]);
     const color = getColorByStatus(metalData?.status);
 
-    const maxColor = getColorByStatus(Number(metalData?.max) - Number(metalData?.yEnd));
-    const minColor = getColorByStatus(Number(metalData?.min) - Number(metalData?.yEnd));
-
     const chartType = useChartStore(state => state.type + state.key);
     const setChartType = useChartStore(state => state.setConfig);
 
@@ -102,12 +99,12 @@ export function MetalItem(props: Props) {
         </div>
         <div className='body'>
             <div className='price'>{metalData?.price || '--'}</div>
-            <div className='ratio'>{metalData?.ratio || '--'}%</div>
+            <div className='ratio'>{metalData?.ratio || '--'}</div>
             <div className='change'>{metalData?.change || '--'}</div>
         </div>
-        <div className='bottom'>
+        {/* <div className='bottom'>
             <div>最高<span style={{ color: maxColor }}>{metalData?.max || '--'}</span></div>
             <div>最低<span style={{ color: minColor }}>{metalData?.min || '--'}</span></div>
-        </div>
+        </div> */}
     </Wrapper>;
 }

@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 import { MetalCharts } from './MetalChart';
+import { useChartStore } from '../../store/chart';
+import { MsMetalCharts } from './MsMetalChart';
 
 const Wrapper = styled.div`
     height: 100%;
@@ -11,7 +13,8 @@ const Wrapper = styled.div`
 `;
 
 export function RealTimeChart() {
+    const chartType = useChartStore(state => state.key);
     return <Wrapper className="box">
-        <MetalCharts />
+        {chartType === 'aums' ? <MsMetalCharts /> : <MetalCharts />}
     </Wrapper>;
 }

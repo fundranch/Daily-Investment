@@ -29,7 +29,7 @@ const Wrapper = styled.div`
             display: grid;
             gap: 15px;
             grid-template-columns: 100%;
-            grid-template-rows: 100px 150px 1fr;
+            grid-template-rows: 100px 100px 1fr;
         }
     }
 `;

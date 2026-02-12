@@ -23,6 +23,7 @@ export function Metal() {
     }, []);
     return <Wrapper>
         <MetalItem type='au' />
+        <MetalItem type='aums' />
         <MetalItem type='aum' />
         <MetalItem type='ag' />
     </Wrapper>;

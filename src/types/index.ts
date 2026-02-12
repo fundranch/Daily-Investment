@@ -8,13 +8,15 @@ export interface CompositeData {
 }
 
 export interface MetalItemData extends CompositeData {
-    max: string
-    min: string
-    yEnd: string
+    max?: string
+    min?: string
+    yEnd?: string
     isClose: boolean
+    chartData?: any
 }
 
-export type MetalData = Record<'au' | 'ag' | 'aum', MetalItemData>
+export type MetalType = 'au' | 'ag' | 'aum' | 'aums'
+export type MetalData = Record<MetalType, MetalItemData>
 
 export interface StorageData {
     interval: number
