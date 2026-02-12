@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { CompositeData } from '../../types';
+import { CompositeData } from '../../../types';
 
 export interface CompositeStore {
     data: CompositeData[]

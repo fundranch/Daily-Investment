@@ -10,10 +10,16 @@ import { SYMBOLS } from '../../../symbols';
 
 @injectable()
 export class MetalApi extends BaseApiFetcher {
+    @inject(SYMBOLS.WatcherBrowserFactory) private watcherBrowserFactory: () => BrowserWindow;
+
     constructor(
         @inject(SYMBOLS.MainBrowserFactory) mainBrowserFactory: () => BrowserWindow
     ) {
         super(mainBrowserFactory);
+    }
+
+    protected get watcherBrowser() {
+        return this.watcherBrowserFactory();
     }
     
     protected get source() {
@@ -66,6 +72,7 @@ export class MetalApi extends BaseApiFetcher {
             }
             // 更新渲染进程数据
             this.mainBrowser?.webContents.send('metal-data-update', data);
+            this.watcherBrowser?.webContents.send('metal-data-update', data);
         } catch(e) { console.error(e); }
     }
 

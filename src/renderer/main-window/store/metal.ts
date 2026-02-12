@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { MetalData, MetalType } from '../../types';
+import { MetalData } from '../../../types';
 
 export interface MetalStore {
     data: MetalData

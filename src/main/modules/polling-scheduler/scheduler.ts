@@ -72,7 +72,6 @@ export class PollingScheduler {
         if(this.timer) return;
         this.pollOnce(clean);
         this.timer = setInterval(() => {
-            console.log('>>>>循环', this.interval);
             this.pollOnce(clean);
         }, this.interval || 6 * 10000);
     }

@@ -1,9 +1,10 @@
-import { SettingOutlined } from '@ant-design/icons';
+import { AlertOutlined, LineChartOutlined, SettingOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import styled from 'styled-components';
 import { useRef, ComponentRef } from 'react';
 import { SettingModal } from './modal/setting';
-import ICON from '../../../../assets/icon.png';
+import ICON from '../../../../../assets/icon.png';
+import { WatcherModal } from './modal/Watcher';
 
 const Wrapper = styled.div`
     display: flex;
@@ -31,8 +32,9 @@ const Wrapper = styled.div`
         display: flex;
         justify-content: flex-end;
         align-items: center;
+        gap: 8px;
         .ant-btn {
-            color: #424242;
+            /* color: #424242; */
             letter-spacing: 2px;
             font-size: 12px;
             padding-inline: 10px !important;
@@ -42,9 +44,14 @@ const Wrapper = styled.div`
 
 export function Title() {
     const settingModalRef = useRef<ComponentRef<typeof SettingModal>>(null);
+    const watcherModalRef = useRef<ComponentRef<typeof WatcherModal>>(null);
 
     function handleOpenSetting() {
         settingModalRef.current?.open();
+    }
+
+    function handleOpenWatcher() {
+        watcherModalRef.current?.open();
     }
 
     return <Wrapper>
@@ -56,7 +63,14 @@ export function Title() {
             <Button shape="round" size='middle' icon={<SettingOutlined />} onClick={handleOpenSetting}>
                 设置
             </Button>
+            <Button shape="round" color='gold' size='middle' icon={<AlertOutlined />} onClick={handleOpenWatcher} variant="solid">
+                通知
+            </Button>
+            <Button shape="round" type='primary' size='middle' icon={<LineChartOutlined />} onClick={handleOpenWatcher}>
+                盯盘
+            </Button>
         </div>
         <SettingModal ref={settingModalRef}/>
+        <WatcherModal ref={watcherModalRef} />
     </Wrapper>;
 }

@@ -41,10 +41,6 @@ export default function App() {
         window.electron.ipcRenderer.invoke('get-setting-data').then((data) => {
             setConfigData(data);
         }).catch((e) => { console.error(e); });
-
-        return () => {
-            // pollingScheduler.stop();
-        };
     }, []);
     return (
         <ConfigProvider
@@ -60,7 +56,7 @@ export default function App() {
                         itemColor: '#333'
                     },
                     Form: {
-                        labelFontSize: 11,
+                        labelFontSize: 12,
                         labelColor: '#333'
                     },
                     Select: {

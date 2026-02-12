@@ -8,15 +8,18 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { EventEmitter } from 'stream';
 import { isDebug } from './modules/env';
 import { createWindow } from './modules/browser-window';
+import { createWindow as createWatcherWindow } from './modules/browser-window/watcher';
 import { container } from './container';
 import { SYMBOLS } from './symbols';
 import { PollingCore } from './modules/polling-scheduler/polling-core';
 import './modules/api';
+import { StorageData } from '../types';
 
 class AppUpdater {
     constructor() {
@@ -48,10 +51,20 @@ app.on('window-all-closed', () => {
 });
 
 app.whenReady().then(() => {
+    const eventBus = container.get<EventEmitter>(SYMBOLS.EventBus);
     if(container.isBound(PollingCore)) {
         container.get(PollingCore).initialize();
     }
     createWindow();
+    eventBus.on('watcher-date-update', (data: StorageData['watcher']) => {
+        if(!data) return;
+        const watchWindow = container.get<() => BrowserWindow>(SYMBOLS.WatcherBrowserFactory)();
+        if(watchWindow && !data.open) {
+            watchWindow.webContents.close();
+        } else if(!watchWindow && data.open) {
+            createWatcherWindow();
+        }
+    });
     app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.

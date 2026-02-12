@@ -19,84 +19,87 @@ checkNodeEnv('production');
 deleteSourceMaps();
 
 const configuration: webpack.Configuration = {
-  devtool: 'source-map',
+    devtool: 'source-map',
 
-  mode: 'production',
+    mode: 'production',
 
-  target: ['web', 'electron-renderer'],
+    target: ['web', 'electron-renderer'],
 
-  entry: [path.join(webpackPaths.srcRendererPath, 'index.tsx')],
-
-  output: {
-    path: webpackPaths.distRendererPath,
-    publicPath: './',
-    filename: 'renderer.js',
-    library: {
-      type: 'umd',
+    entry: {
+        'main-window': [path.join(webpackPaths.srcRendererPath, 'main-window/index.tsx')],
+        'watcher-window': [path.join(webpackPaths.srcRendererPath, 'watcher-window/index.tsx')],
     },
-  },
 
-  module: {
-    rules: [
-      {
-        test: /\.s?(a|c)ss$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: 'css-loader',
-            options: {
-              modules: true,
-              sourceMap: true,
-              importLoaders: 1,
+    output: {
+        path: webpackPaths.distRendererPath,
+        publicPath: './',
+        filename: 'renderer.js',
+        library: {
+            type: 'umd',
+        },
+    },
+
+    module: {
+        rules: [
+            {
+                test: /\.s?(a|c)ss$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                            sourceMap: true,
+                            importLoaders: 1,
+                        },
+                    },
+                    'sass-loader',
+                ],
+                include: /\.module\.s?(c|a)ss$/,
             },
-          },
-          'sass-loader',
-        ],
-        include: /\.module\.s?(c|a)ss$/,
-      },
-      {
-        test: /\.s?(a|c)ss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
-        exclude: /\.module\.s?(c|a)ss$/,
-      },
-      // Fonts
-      {
-        test: /\.(woff|woff2|eot|ttf|otf)$/i,
-        type: 'asset/resource',
-      },
-      // Images
-      {
-        test: /\.(png|jpg|jpeg|gif)$/i,
-        type: 'asset/resource',
-      },
-      // SVG
-      {
-        test: /\.svg$/,
-        use: [
-          {
-            loader: '@svgr/webpack',
-            options: {
-              prettier: false,
-              svgo: false,
-              svgoConfig: {
-                plugins: [{ removeViewBox: false }],
-              },
-              titleProp: true,
-              ref: true,
+            {
+                test: /\.s?(a|c)ss$/,
+                use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+                exclude: /\.module\.s?(c|a)ss$/,
             },
-          },
-          'file-loader',
+            // Fonts
+            {
+                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                type: 'asset/resource',
+            },
+            // Images
+            {
+                test: /\.(png|jpg|jpeg|gif)$/i,
+                type: 'asset/resource',
+            },
+            // SVG
+            {
+                test: /\.svg$/,
+                use: [
+                    {
+                        loader: '@svgr/webpack',
+                        options: {
+                            prettier: false,
+                            svgo: false,
+                            svgoConfig: {
+                                plugins: [{ removeViewBox: false }],
+                            },
+                            titleProp: true,
+                            ref: true,
+                        },
+                    },
+                    'file-loader',
+                ],
+            },
         ],
-      },
-    ],
-  },
+    },
 
-  optimization: {
-    minimize: true,
-    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
-  },
+    optimization: {
+        minimize: true,
+        minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
+    },
 
-  plugins: [
+    plugins: [
     /**
      * Create global constants which can be configured at compile time.
      *
@@ -106,36 +109,50 @@ const configuration: webpack.Configuration = {
      * NODE_ENV should be production so that modules do not perform certain
      * development checks
      */
-    new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production',
-      DEBUG_PROD: false,
-    }),
+        new webpack.EnvironmentPlugin({
+            NODE_ENV: 'production',
+            DEBUG_PROD: false,
+        }),
 
-    new MiniCssExtractPlugin({
-      filename: 'style.css',
-    }),
+        new MiniCssExtractPlugin({
+            filename: 'style.css',
+        }),
 
-    new BundleAnalyzerPlugin({
-      analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',
-      analyzerPort: 8889,
-    }),
+        new BundleAnalyzerPlugin({
+            analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',
+            analyzerPort: 8889,
+        }),
 
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: path.join(webpackPaths.srcRendererPath, 'index.ejs'),
-      minify: {
-        collapseWhitespace: true,
-        removeAttributeQuotes: true,
-        removeComments: true,
-      },
-      isBrowser: false,
-      isDevelopment: false,
-    }),
+        new HtmlWebpackPlugin({
+            filename: 'main-window/index.html',
+            chunks: ['main-window'],
+            template: path.join(webpackPaths.srcRendererPath, 'main-window/index.ejs'),
+            minify: {
+                collapseWhitespace: true,
+                removeAttributeQuotes: true,
+                removeComments: true,
+            },
+            isBrowser: false,
+            isDevelopment: false,
+        }),
 
-    new webpack.DefinePlugin({
-      'process.type': '"renderer"',
-    }),
-  ],
+        new HtmlWebpackPlugin({
+            filename: 'watcher-window/index.html',
+            chunks: ['watcher-window'],
+            template: path.join(webpackPaths.srcRendererPath, 'watcher-window/index.ejs'),
+            minify: {
+                collapseWhitespace: true,
+                removeAttributeQuotes: true,
+                removeComments: true,
+            },
+            isBrowser: false,
+            isDevelopment: false,
+        }),
+
+        new webpack.DefinePlugin({
+            'process.type': '"renderer"',
+        }),
+    ],
 };
 
 export default merge(baseConfig, configuration);

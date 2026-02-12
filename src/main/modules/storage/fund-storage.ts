@@ -14,6 +14,11 @@ export class StorageModule {
 
     public data: StorageData | null = {
         holdFundsSource: {},
+        watcher: {
+            open: false,
+            fund: [],
+            metal: ['aums']
+        },
         interval: 5000,
         fundSource: 1,
         selfSelectedFundsSource: {}
@@ -31,6 +36,15 @@ export class StorageModule {
         ipcMain.handle('set-setting-data', async (event, data) => {
             const res = await this.setAppData(data);
             this.eventBus.emit('polling-scheduler-restart');
+            return res;
+        });
+        ipcMain.handle('set-watcher-data', async (event, data) => {
+            const newData: StorageData = {
+                ...this.data!,
+                watcher: { ...data }
+            };
+            const res = await this.setAppData(newData);
+            this.eventBus.emit('watcher-date-update', newData.watcher);
             return res;
         });
     }

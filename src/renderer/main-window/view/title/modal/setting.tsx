@@ -2,7 +2,7 @@ import { GetProp, Menu, MenuProps, Modal } from 'antd';
 import React, { forwardRef, useState } from 'react';
 import styled from 'styled-components';
 import { InfoCircleOutlined, SettingOutlined } from '@ant-design/icons';
-import { SetttingContent } from './SettingContent';
+import { SettingContent } from './SettingContent';
 
 type MenuItem = GetProp<MenuProps, 'items'>[number];
 
@@ -58,7 +58,7 @@ const SettingModal = forwardRef<SettingModalHandle, {}>((props, ref) => {
 
     function getContent() {
         if(activeMenu === 'setting') {
-            return <SetttingContent setOpen={setOpen} />;
+            return <SettingContent setOpen={setOpen} />;
         } 
         return null;
     }

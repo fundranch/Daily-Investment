@@ -21,6 +21,11 @@ export type MetalData = Record<MetalType, MetalItemData>
 export interface StorageData {
     interval: number
     fundSource: 0 | 1 // 全局数据源
+    watcher: {
+        open: boolean
+        metal: MetalType[] // 有色盯盘项
+        fund: string[] // 基金盯盘项
+    }
     holdFundsSource: Record<string, 0 | 1>
     selfSelectedFundsSource: Record<string, 0 | 1>
 }

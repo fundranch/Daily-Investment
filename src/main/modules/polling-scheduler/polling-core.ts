@@ -27,6 +27,7 @@ export class PollingCore {
     public async initialize() {
         try {
             await this.getPollingConfig();
+            this.eventBus.emit('watcher-date-update', this.storageModule.data?.watcher);
             this.pollingScheduler.start();
         } catch(e) {
             console.error(e);

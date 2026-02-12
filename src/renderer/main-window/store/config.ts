@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { StorageData } from '../../types';
+import { StorageData } from '../../../types';
 
 export interface StorageStore {
     data: StorageData

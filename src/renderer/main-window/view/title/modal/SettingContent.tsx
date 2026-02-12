@@ -33,7 +33,7 @@ const Wrapper = styled.div`
     }
 `;
 
-export function SetttingContent(props: Props) {
+export function SettingContent(props: Props) {
     const [form] = Form.useForm<{interval: number, fundSource: 0 | 1}>();
 
     const [loading, setLoading] = useState(false);
@@ -42,6 +42,7 @@ export function SetttingContent(props: Props) {
     const setConfigData = useConfigStore(state => state.setData);
 
     useEffect(() => {
+        console.log(configData);
         form.setFieldsValue({
             interval: configData.interval,
             fundSource: configData.fundSource

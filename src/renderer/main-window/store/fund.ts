@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { BaseFundData } from '../../types';
+import { BaseFundData } from '../../../types';
 
 export interface SelfSelectedFund extends BaseFundData {
     added_nav: string
