@@ -115,7 +115,7 @@ const configuration: webpack.Configuration = {
         }),
 
         new MiniCssExtractPlugin({
-            filename: '[name].css',
+            filename: '[name].[contenthash].css',
         }),
 
         new BundleAnalyzerPlugin({
