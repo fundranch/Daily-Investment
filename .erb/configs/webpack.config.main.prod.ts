@@ -36,14 +36,15 @@ const configuration: webpack.Configuration = {
     },
 
     optimization: {
-        minimizer: [
-            new TerserPlugin({
-                parallel: true,
-                terserOptions: {
-                    ecma: 2020
-                }
-            }),
-        ],
+        minimize: false,
+        // minimizer: [
+        //     new TerserPlugin({
+        //         parallel: true,
+        //         terserOptions: {
+        //             ecma: 2020
+        //         }
+        //     }),
+        // ],
     },
 
     plugins: [
