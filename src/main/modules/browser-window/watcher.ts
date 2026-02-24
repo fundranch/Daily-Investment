@@ -8,10 +8,15 @@ import '../polling-scheduler';
 import { container } from '../../container';
 import { SYMBOLS } from '../../symbols';
 import { PollingScheduler } from '../polling-scheduler/scheduler';
+import { StorageData } from '../../../types';
 
 let watcherWindow: BrowserWindow | null = null;
 
 const TITLE_HEIGHT = 30;
+
+const BASE_WIDGTH = 250;
+
+const LINE_HEIGHT = 40;
 
 container.bind<() => BrowserWindow | null>(SYMBOLS.WatcherBrowserFactory).toFactory(() => {
     return () => watcherWindow;
@@ -34,11 +39,9 @@ export async function createWindow() {
         show: false,
         frame: false,
         resizable: false,
-        // width: 500,
-        // height: 400,
         alwaysOnTop: true,
-        width: 250,
-        height: 40,
+        width: BASE_WIDGTH,
+        height: LINE_HEIGHT,
         x: 50,
         y: 50,
         backgroundColor: '#fff',
@@ -58,7 +61,6 @@ export async function createWindow() {
         const bounds = watcherWindow?.contentView.getBounds();
         if(!bounds) return;
         watcherWindow?.setBounds({
-            width: bounds.width,
             height: bounds.height + TITLE_HEIGHT
         });
         watcherWindow?.webContents.send('hide-watcher-title', false);
@@ -68,7 +70,6 @@ export async function createWindow() {
         const bounds = watcherWindow?.contentView.getBounds();
         if(!bounds) return;
         watcherWindow?.setBounds({
-            width: bounds.width,
             height: bounds.height - TITLE_HEIGHT
         });
         watcherWindow?.webContents.send('hide-watcher-title', true);
@@ -108,4 +109,13 @@ export async function createWindow() {
     // Remove this if your app does not use auto updates
     // eslint-disable-next-line
     //   new AppUpdater();
+}
+
+const MAX_LENGTH = 6;
+export function resizeWindow(config: StorageData['watcher']) {
+    const length = config.fund.length + config.metal.length;
+    const currentHeight = length > MAX_LENGTH ? MAX_LENGTH * LINE_HEIGHT : length * LINE_HEIGHT;
+    watcherWindow?.setBounds({
+        height: currentHeight
+    });
 }

@@ -8,11 +8,16 @@ export type Options = { clean?: boolean, [x: string]: any }
 export abstract class BaseApiFetcher {
 
     constructor(
-        @inject(SYMBOLS.MainBrowserFactory) protected mainBrowserFactory: () => BrowserWindow
+        @inject(SYMBOLS.MainBrowserFactory) protected mainBrowserFactory: () => BrowserWindow,
+        @inject(SYMBOLS.WatcherBrowserFactory) protected watcherBrowserFactory?: () => BrowserWindow
     ) {}
 
     protected get mainBrowser() {
         return this.mainBrowserFactory();
+    }
+
+    protected get watcherBrowser() {
+        return this.watcherBrowserFactory?.() || null;
     }
     
     protected abortController: AbortController = new AbortController();

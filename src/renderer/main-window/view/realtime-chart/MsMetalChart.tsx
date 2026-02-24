@@ -45,7 +45,7 @@ export function MsMetalCharts() {
     useEffect(() => {
         let min = Number.MAX_SAFE_INTEGER;
         let max = 0;
-        const chartData: any = storeData.chartData.map((i: any) => {
+        const chartData: any = storeData?.chartData.map((i: any) => {
             const [date] = i.value;
             const price = Number(i.value[1]);
             if(price !== -1) {
@@ -66,7 +66,7 @@ export function MsMetalCharts() {
             },
             series: [{ name: 'realtime-line', data: chartData || [] }]
         });
-    }, [storeData.chartData]);
+    }, [storeData?.chartData]);
 
     useEffect(() => {
         chart.current = echarts.init(wrapperRef.current!);

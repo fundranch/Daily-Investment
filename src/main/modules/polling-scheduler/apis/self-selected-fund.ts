@@ -18,9 +18,10 @@ export class SelfSelectedFundApi extends BaseApiFetcher {
     @inject(StorageModule) private storage: StorageModule;
 
     constructor(
-        @inject(SYMBOLS.MainBrowserFactory) mainBrowserFactory: () => BrowserWindow
+        @inject(SYMBOLS.MainBrowserFactory) mainBrowserFactory: () => BrowserWindow,
+        @inject(SYMBOLS.WatcherBrowserFactory) watcherBrowserFactory: () => BrowserWindow
     ) {
-        super(mainBrowserFactory);
+        super(mainBrowserFactory, watcherBrowserFactory);
     }
 
     private getSource(code: string) {
@@ -57,6 +58,7 @@ export class SelfSelectedFundApi extends BaseApiFetcher {
             const data = await this.handleFetchData(res);
             // 更新渲染进程数据
             this.mainBrowser?.webContents.send('self-selected-fund-update', data);
+            this.watcherBrowser?.webContents.send('self-selected-fund-update', data);
         } catch(e) {
             console.error(e);
         }   

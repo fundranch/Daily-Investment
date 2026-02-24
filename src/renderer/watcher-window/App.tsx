@@ -1,15 +1,17 @@
 import styled from 'styled-components';
 import './App.css';
 import { useEffect, useState } from 'react';
-import { CloseOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
 import { COLORS } from '../main-window/utils/color';
 import ICON from '../../../assets/icon.png';
-import { MetalWatcher } from './view/MetalWatcher';
+import { Watcher } from './view/Watcher';
 import { useConfigStore } from './store/config';
 
 const Wrapper = styled.div`
+    overflow-y: scroll;
     -webkit-app-region: drag;
+    &::-webkit-scrollbar {
+        width: 0;
+    }
     .watcher-title {
         width: 100%;
         height: 30px;
@@ -56,17 +58,13 @@ export default function App() {
             setHide(data as any);
         });
     }, []);
-    function handleClose() {
-        window.electron.ipcRenderer.sendMessage('close-watcher-window');
-    }
     return (
         <Wrapper className='watcher-title-wrapper'>
             {!hide && <div className='watcher-title'>
                 <img src={ICON} alt="" />
                 <span className='title'>小金管家</span>
-                {/* <Button type='text' size='small' icon={<CloseOutlined />} onClick={handleClose} /> */}
             </div>}
-            <MetalWatcher />
+            <Watcher />
         </Wrapper>
     );
 }

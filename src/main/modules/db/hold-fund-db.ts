@@ -32,6 +32,10 @@ export class HoldFundDbService {
             }
             return false;
         });
+        ipcMain.handle('get-hold-fund', async () => {
+            const data = this.getAllFunds();
+            return data.map(i => ({ code:i.code, name: i.name }));
+        });
     }
 
     private addFund(data: HoldFundDb) {

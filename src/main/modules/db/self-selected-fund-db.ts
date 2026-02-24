@@ -30,6 +30,10 @@ export class SelfSelectedFundDbService {
             }
             return false;
         });
+        ipcMain.handle('get-self-selected-fund', async () => {
+            const data = this.getAllFunds();
+            return data.map(i => ({ code:i.code, name: i.name }));
+        });
     }
 
     private getSource(code: string) {

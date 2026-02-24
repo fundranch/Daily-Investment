@@ -2,9 +2,25 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'hide-watcher-title' | 'close-watcher-window' | 'composite-data-update' | 'metal-data-update' | 'chart-data-update' | 'select-chart-type' | 'refresh-polling' | 'self-selected-fund-update' | 'hold-fund-update' | 'browser-context-menu';
+export type Channels = 'hide-watcher-title'
+    | 'close-watcher-window'
+    | 'composite-data-update'
+    | 'metal-data-update'
+    | 'chart-data-update'
+    | 'select-chart-type'
+    | 'refresh-polling'
+    | 'self-selected-fund-update'
+    | 'hold-fund-update'
+    | 'browser-context-menu';
 
-export type InvokeChannels = 'set-watcher-data' | 'get-setting-data' | 'set-setting-data' | 'fund-search' | 'change-self-selected-fund' | 'change-hold-fund'
+export type InvokeChannels = 'set-watcher-data'
+    | 'get-setting-data'
+    | 'set-setting-data'
+    | 'fund-search'
+    | 'change-self-selected-fund'
+    | 'change-hold-fund'
+    | 'get-self-selected-fund'
+    | 'get-hold-fund'
 
 const electronHandler = {
     ipcRenderer: {
@@ -30,7 +46,6 @@ const electronHandler = {
             } catch(e) {
                 return null;
             }
-            
         }
     },
 };

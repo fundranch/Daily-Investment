@@ -42,7 +42,6 @@ export function SettingContent(props: Props) {
     const setConfigData = useConfigStore(state => state.setData);
 
     useEffect(() => {
-        console.log(configData);
         form.setFieldsValue({
             interval: configData.interval,
             fundSource: configData.fundSource

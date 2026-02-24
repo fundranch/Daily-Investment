@@ -14,7 +14,7 @@ import log from 'electron-log';
 import { EventEmitter } from 'stream';
 import { isDebug } from './modules/env';
 import { createWindow } from './modules/browser-window';
-import { createWindow as createWatcherWindow } from './modules/browser-window/watcher';
+import { createWindow as createWatcherWindow, resizeWindow } from './modules/browser-window/watcher';
 import { container } from './container';
 import { SYMBOLS } from './symbols';
 import { PollingCore } from './modules/polling-scheduler/polling-core';
@@ -56,13 +56,17 @@ app.whenReady().then(() => {
         container.get(PollingCore).initialize();
     }
     createWindow();
-    eventBus.on('watcher-date-update', (data: StorageData['watcher']) => {
+    eventBus.on('watcher-date-update', async (data: StorageData['watcher']) => {
         if(!data) return;
         const watchWindow = container.get<() => BrowserWindow>(SYMBOLS.WatcherBrowserFactory)();
         if(watchWindow && !data.open) {
             watchWindow.webContents.close();
         } else if(!watchWindow && data.open) {
-            createWatcherWindow();
+            await createWatcherWindow();
+        }
+        if(data.open) {
+            // 根据配置项重新计算window的大小
+            resizeWindow(data);
         }
     });
     app.on('activate', () => {
