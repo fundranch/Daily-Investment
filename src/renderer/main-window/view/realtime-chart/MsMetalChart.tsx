@@ -59,11 +59,15 @@ export function MsMetalCharts() {
             return [new Date(date), price === -1 ? null : price];
         });
         const padding = (max - min) * 0.5;
-        chart.current?.setOption({
-            yAxis: {
+        let yAxis: Record<string, number> = {};
+        if(chartData.length) {
+            yAxis = {
                 min: calcYAxisSide(min - padding, 'floor'),
                 max: calcYAxisSide(max + padding, 'ceil')
-            },
+            };
+        }
+        chart.current?.setOption({
+            yAxis: { ...yAxis },
             series: [{ name: 'realtime-line', data: chartData || [] }]
         });
     }, [storeData?.chartData]);

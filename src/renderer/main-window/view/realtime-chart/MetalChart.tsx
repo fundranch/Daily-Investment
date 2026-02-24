@@ -58,11 +58,15 @@ export function MetalCharts() {
                 return [new Date(i.date), i.price === -1 ? null : i.price];
             });
             const padding = (max - min) * 0.5;
-            chart.current?.setOption({
-                yAxis: {
+            let yAxis: Record<string, number> = {};
+            if(chartData.length) {
+                yAxis = {
                     min: calcYAxisSide(min - padding, 'floor'),
                     max: calcYAxisSide(max + padding, 'ceil')
-                },
+                };
+            }
+            chart.current?.setOption({
+                yAxis: { ...yAxis },
                 series: [{ name: 'realtime-line', data: chartData || [] }]
             });
             setType(data.key);
