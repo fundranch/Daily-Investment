@@ -35,6 +35,6 @@ export class PollingCore {
     }
 
     private async getPollingConfig() {
-        await this.storageModule.getAppData();
+        await this.storageModule.initAppData();
     }
 }

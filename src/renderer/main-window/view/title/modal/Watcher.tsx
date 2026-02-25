@@ -35,7 +35,7 @@ const WatcherModal = forwardRef<WatcherModalHandle, {}>((props, ref) => {
     }));
     
     useEffect(() => {
-        if(!open) return;
+        console.log('-----', configData.watcher);
         form.setFieldsValue({
             open: configData.watcher?.open,
             metal: configData.watcher?.metal,

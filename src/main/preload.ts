@@ -11,7 +11,8 @@ export type Channels = 'hide-watcher-title'
     | 'refresh-polling'
     | 'self-selected-fund-update'
     | 'hold-fund-update'
-    | 'browser-context-menu';
+    | 'browser-context-menu'
+    | 'update-setting-data';
 
 export type InvokeChannels = 'set-watcher-data'
     | 'get-setting-data'

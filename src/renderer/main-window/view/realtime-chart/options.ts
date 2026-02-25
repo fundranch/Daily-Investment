@@ -43,8 +43,8 @@ export function getBaseOptions() {
         grid: {
             top: 20,
             bottom: 20,
-            left: 25,
-            right: 25
+            left: 40,
+            right: 40
         },
         series: [
             {

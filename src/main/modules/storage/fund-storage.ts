@@ -1,4 +1,4 @@
-import { app, ipcMain } from 'electron';
+import { app, ipcMain, BrowserWindow } from 'electron';
 import { inject, injectable, postConstruct } from 'inversify';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -34,7 +34,10 @@ export class StorageModule {
             return data;
         });
         ipcMain.handle('set-setting-data', async (event, data) => {
-            const res = await this.setAppData(data);
+            const res = await this.setAppData({
+                ...this.data!,
+                ...data
+            });
             this.eventBus.emit('polling-scheduler-restart');
             return res;
         });
@@ -47,6 +50,11 @@ export class StorageModule {
             this.eventBus.emit('watcher-date-update', newData.watcher);
             return res;
         });
+    }
+
+    public async initAppData() {
+        await this.getAppData();
+        this.updateSettingDataEmitter();
     }
 
     public getFilePath() {
@@ -79,9 +87,18 @@ export class StorageModule {
         try {
             await fs.writeFile(appPath, handleData);
             this.data = JSON.parse(handleData);
+            this.updateSettingDataEmitter();
             return true;
         } catch(e) {
             return false;
         }
+    }
+
+    // 给所有进程发送更新消息
+    private updateSettingDataEmitter() {
+        const windows = BrowserWindow.getAllWindows();
+        windows.forEach(window => {
+            window.webContents.send('update-setting-data', this.data);
+        });
     }
 }

@@ -51,9 +51,12 @@ export default function App() {
     const setConfigData = useConfigStore(state => state.setData);
     const [hide, setHide] = useState(true);
     useEffect(() => {
+        window.electron.ipcRenderer.on('update-setting-data', (data: any) => {
+            setConfigData(data);
+        });
         window.electron.ipcRenderer.invoke('get-setting-data').then((data) => {
             setConfigData(data);
-        }).catch((e) => { console.error(e); });
+        });
         window.electron.ipcRenderer.on('hide-watcher-title', (data) => {
             setHide(data as any);
         });

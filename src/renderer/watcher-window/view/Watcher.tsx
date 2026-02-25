@@ -1,13 +1,18 @@
 import styled from 'styled-components';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { useConfigStore } from '../store/config';
 import { BaseFundData, MetalData, MetalType } from '../../../types';
 import { getColorByStatus } from '../../main-window/utils/color';
-// import { useFundStore } from '../../main-window/store/fund';
 
 const Wrapper = styled.div` 
     padding-inline: 10px;
+    .info {
+        line-height: 40px;
+        font-size: 13px;
+        font-weight: 800;
+        color: #333;
+    }
     .metal-item {
         display: grid;
         grid-template-columns: 2fr 1fr 60px;
@@ -84,23 +89,27 @@ export function Watcher() {
     }, [watchList.fund]);
 
     return <Wrapper>
-        {
-            watchList?.metal?.map((i) => {
-                const value = metalData?.[i];
-                return value && (<div className='metal-item' style={{ color: getColorByStatus(value.status) }}>
-                    <div className='name'>{value.name}</div>
-                    <div className='price'>{value.price}</div>
-                    <div className='ratio'>{value.ratio}</div>
-                </div>);
-            })
-        }
-        {
-            fundData.map(i => (
-                <div className='fund-item' key={i.code}>
-                    <div className='name'>{i.name}</div>
-                    <div className='change' style={{ color: getColorByStatus(i.status!) }}>{i.estimateChange}</div>
-                </div>
-            ))
+        { !watchList?.metal?.length && !watchList?.fund?.length
+            ? <div className='info'>请添加盯盘数据</div>
+            : <>
+                {
+                    watchList?.metal?.map((i) => {
+                        const value = metalData?.[i];
+                        return value && (<div className='metal-item' style={{ color: getColorByStatus(value.status) }}>
+                            <div className='name'>{value.name}</div>
+                            <div className='price'>{value.price}</div>
+                            <div className='ratio'>{value.ratio}</div>
+                        </div>);
+                    })
+                }
+                {
+                    fundData.map(i => (
+                        <div className='fund-item' key={i.code}>
+                            <div className='name'>{i.name}</div>
+                            <div className='change' style={{ color: getColorByStatus(i.status!) }}>{i.estimateChange}</div>
+                        </div>
+                    ))
+                }</>
         }
     </Wrapper>;
 }

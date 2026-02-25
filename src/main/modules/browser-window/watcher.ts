@@ -114,7 +114,7 @@ export async function createWindow() {
 const MAX_LENGTH = 6;
 export function resizeWindow(config: StorageData['watcher']) {
     const length = config.fund.length + config.metal.length;
-    const currentHeight = length > MAX_LENGTH ? MAX_LENGTH * LINE_HEIGHT : length * LINE_HEIGHT;
+    const currentHeight = length > MAX_LENGTH ? MAX_LENGTH * LINE_HEIGHT : (length || 1) * LINE_HEIGHT;
     watcherWindow?.setBounds({
         height: currentHeight
     });

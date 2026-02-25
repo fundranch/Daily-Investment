@@ -1,10 +1,7 @@
 import * as echarts from 'echarts';
-import { useEffect, useRef, useState } from 'react';
-import dayjs from 'dayjs';
+import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { debounce } from 'lodash';
 import { Tag } from 'antd';
-import { COLORS } from '../../utils/color';
 import { useMetalStore } from '../../store/metal';
 import { getBaseOptions } from './options';
 import { useResizeObserverDebounce } from '../../hooks/useResizeObserverDebounce';
