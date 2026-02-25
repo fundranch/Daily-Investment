@@ -73,6 +73,7 @@ module.exports = {
                 asyncArrow: 'always', // 异步箭头函数：async () => 需要空格
             },
         ],
+        'no-underscore-dangle': 'off',
         'no-use-before-define': ['error', { 'functions': false }],
 
         // 模板字符串中大括号内部不需要空格
