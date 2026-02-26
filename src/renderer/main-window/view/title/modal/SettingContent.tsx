@@ -71,6 +71,7 @@ export function SettingContent(props: Props) {
                     style={{ width: 200, height: 20, fontSize: 10 }}
                     options={[
                         { label: '每秒', value: 1000 },
+                        { label: '每3秒', value: 1000 * 3 },
                         { label: '每5秒', value: 1000 * 5 },
                         { label: '每10秒', value: 1000 * 10 },
                         { label: '每30秒', value: 1000 * 30 },
