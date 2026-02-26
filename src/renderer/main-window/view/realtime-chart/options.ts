@@ -6,7 +6,7 @@ export function getBaseOptions() {
     const options: echarts.EChartOption = {
         xAxis: {
             type: 'time',
-            boundaryGap: false,
+            splitNumber: 5,
             axisTick: { show: false },
             axisLine: { lineStyle: { color: '#f5f5f5' } },
             axisLabel: { 
@@ -53,7 +53,7 @@ export function getBaseOptions() {
                 type: 'line',
                 lineStyle: {
                     color: '#ed9857',
-                    width: 0.8
+                    width: 1
                 },
                 areaStyle: {
                     opacity: 0.2,

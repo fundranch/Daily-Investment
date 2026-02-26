@@ -57,7 +57,7 @@ export function MsMetalCharts() {
         });
         const padding = (max - min) * 0.5;
         let yAxis: Record<string, number> = {};
-        if(chartData.length) {
+        if(chartData?.length) {
             yAxis = {
                 min: calcYAxisSide(min - padding, 'floor'),
                 max: calcYAxisSide(max + padding, 'ceil')
@@ -85,7 +85,7 @@ export function MsMetalCharts() {
     return <Wrapper>
         <div className='title'>
             {getTitle()}
-            {storeData.isClose && <Tag color='#108ee9' variant='filled'>休市中</Tag>}
+            {storeData?.isClose && <Tag color='#108ee9' variant='filled'>休市中</Tag>}
         </div>
         <div className='chart' ref={wrapperRef} />
     </Wrapper>;

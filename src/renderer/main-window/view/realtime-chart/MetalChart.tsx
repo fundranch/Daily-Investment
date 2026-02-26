@@ -59,7 +59,7 @@ export function MetalCharts() {
             });
             const padding = (max - min) * 0.5;
             let yAxis: Record<string, number> = {};
-            if(chartData.length) {
+            if(chartData?.length) {
                 yAxis = {
                     min: calcYAxisSide(min - padding, 'floor'),
                     max: calcYAxisSide(max + padding, 'ceil')
