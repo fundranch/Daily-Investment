@@ -39,7 +39,6 @@ export function SettingContent(props: Props) {
     const [loading, setLoading] = useState(false);
 
     const configData = useConfigStore(state => state.data);
-    const setConfigData = useConfigStore(state => state.setData);
 
     useEffect(() => {
         form.setFieldsValue({
@@ -59,7 +58,6 @@ export function SettingContent(props: Props) {
             const res = await window.electron.ipcRenderer.invoke('set-setting-data', { ...formData });
             if(!res) return;
             props.setOpen(false);
-            setConfigData({ ...configData, ...formData });
         } catch(e) {
             console.error(e);
         }

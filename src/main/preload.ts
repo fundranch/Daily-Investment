@@ -15,6 +15,7 @@ export type Channels = 'hide-watcher-title'
     | 'update-setting-data';
 
 export type InvokeChannels = 'set-watcher-data'
+    | 'set-notifies-data'
     | 'get-setting-data'
     | 'set-setting-data'
     | 'fund-search'

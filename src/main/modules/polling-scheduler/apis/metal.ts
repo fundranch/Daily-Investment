@@ -7,15 +7,17 @@ import { FAKE_HEADERS, JD_FAKE_HEADERS } from './config';
 import { handleMetalApiData } from '../utils';
 import { MetalData, MetalItemData } from '../../../../types';
 import { SYMBOLS } from '../../../symbols';
+import { EventBus } from '../../events';
 
 @injectable()
 export class MetalApi extends BaseApiFetcher {
-    @inject(SYMBOLS.WatcherBrowserFactory) private watcherBrowserFactory: () => BrowserWindow;
+    @inject(SYMBOLS.EventBus) eventBus: EventBus;
 
     constructor(
-        @inject(SYMBOLS.MainBrowserFactory) mainBrowserFactory: () => BrowserWindow
+        @inject(SYMBOLS.MainBrowserFactory) mainBrowserFactory: () => BrowserWindow,
+        @inject(SYMBOLS.WatcherBrowserFactory) protected watcherBrowserFactory: () => BrowserWindow
     ) {
-        super(mainBrowserFactory);
+        super(mainBrowserFactory, watcherBrowserFactory);
     }
 
     protected get watcherBrowser() {
@@ -73,6 +75,13 @@ export class MetalApi extends BaseApiFetcher {
             // 更新渲染进程数据
             this.mainBrowser?.webContents.send('metal-data-update', data);
             this.watcherBrowser?.webContents.send('metal-data-update', data);
+            this.watcherBrowser?.webContents.send('metal-data-update', data);
+            this.eventBus.emit('message-data-update', {
+                au: parseFloat(data.au.ratio),
+                ag: parseFloat(data.ag.ratio),
+                aum: parseFloat(data.aum.ratio),
+                aums: parseFloat(data.aums.ratio)
+            });
         } catch(e) { console.error(e); }
     }
 

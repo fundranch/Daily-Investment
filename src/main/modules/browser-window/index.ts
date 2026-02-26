@@ -6,7 +6,7 @@ import { installExtensions } from '../extensions';
 import { getAssetPath, resolveHtmlPath } from '../../util';
 import { MenuBuilder } from '../menu';
 import '../polling-scheduler';
-import { Notifies } from '../notifies';
+import { Notifies } from '../notifies/main';
 
 @injectable()
 export class MainWindow {
@@ -59,7 +59,7 @@ export class MainWindow {
             } else {
                 this._window.show();
             }
-            this.notifies.test();
+            this.notifies.start();
         });
 
         this._window?.on('closed', () => {

@@ -20,3 +20,6 @@ body, html, #root {
     padding: 10px;
     border-radius: 16px;
 }
+.ant-select, .ant-input-number {
+    font-size: 12px;
+}

@@ -7,9 +7,12 @@ import { StorageModule } from '../../storage/fund-storage';
 import { getFundStatus, handleFundEstimateDataSource_0, handleFundEstimateDataSource_1 } from '../utils';
 import { BaseFundData } from '../../../../types';
 import { HoldFundDbService } from '../../db/hold-fund-db';
+import { EventBus } from '../../events';
 
 @injectable()
 export class HoldFundApi extends BaseApiFetcher {
+    @inject(SYMBOLS.EventBus) eventBus: EventBus;
+
     @inject(HoldFundDbService) private db: HoldFundDbService;
 
     @inject(StorageModule) private storage: StorageModule;
@@ -56,6 +59,10 @@ export class HoldFundApi extends BaseApiFetcher {
             // 更新渲染进程数据
             this.mainBrowser?.webContents.send('hold-fund-update', data);
             this.watcherBrowser?.webContents.send('hold-fund-update', data);
+            this.eventBus.emit('message-data-update', data.reduce<Record<string, number>>((pre, i: any) => {
+                pre[i.code] = parseFloat(i.estimateChange);
+                return pre;
+            }, {}));
         } catch(e) {
             console.error(e);
         }   

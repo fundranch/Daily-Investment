@@ -37,10 +37,13 @@ const Wrapper = styled.div`
 export default function App() {
     const setConfigData = useConfigStore(state => state.setData);
     useEffect(() => {
+        window.electron.ipcRenderer.on('update-setting-data', (data: any) => {
+            setConfigData(data);
+        });
         window.electron.ipcRenderer.sendMessage('refresh-polling');
         window.electron.ipcRenderer.invoke('get-setting-data').then((data) => {
             setConfigData(data);
-        }).catch((e) => { console.error(e); });
+        });
     }, []);
     return (
         <ConfigProvider

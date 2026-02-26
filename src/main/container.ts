@@ -7,9 +7,9 @@ import { SYMBOLS } from './symbols';
 import { EventBus } from './modules/events';
 import { bindDbProcess } from './modules/db';
 import { MenuBuilder } from './modules/menu';
-import { Notifies } from './modules/notifies';
 import { MainWindow } from './modules/browser-window';
 import { WatcherWindow } from './modules/browser-window/watcher';
+import { bindNotifiesProcess } from './modules/notifies';
 
 export const container = new Container();
 
@@ -29,11 +29,11 @@ const watcherWindowGetter = () => {
 container.bind<() => BrowserWindow | null>(SYMBOLS.WatcherBrowserFactory)
     .toConstantValue(watcherWindowGetter);
 
-container.bind(Notifies).toSelf().inSingletonScope();
-
-container.bind(MenuBuilder).toSelf().inRequestScope();
+container.bind(MenuBuilder).toSelf().inTransientScope();
 
 bindStorageProcess(container);
+
+bindNotifiesProcess(container);
 
 bindPollingProcess(container);
 

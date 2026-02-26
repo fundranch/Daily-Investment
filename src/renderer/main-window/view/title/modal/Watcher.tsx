@@ -3,6 +3,7 @@ import React, { forwardRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useConfigStore } from '../../../store/config';
 import { MetalType } from '../../../../../types';
+import { getFundList, METAL_OPTIONS } from '../utils';
 
 const Wrapper = styled.div`
     .metal-check-box .ant-checkbox-label {
@@ -26,16 +27,17 @@ const WatcherModal = forwardRef<WatcherModalHandle, {}>((props, ref) => {
     const setConfigData = useConfigStore(state => state.setData);
     const [open, setOpen] = React.useState(false);
 
+    const [fundList, setFundList] = useState<{label: string, value: string}[]>([]);
     React.useImperativeHandle(ref, () => ({
-        open() {
+        async open() {
             setOpen(true);
             // 获取基金列表
-            getFundList();
+            const data = await getFundList();
+            setFundList(data);
         }
     }));
     
     useEffect(() => {
-        console.log('-----', configData.watcher);
         form.setFieldsValue({
             open: configData.watcher?.open,
             metal: configData.watcher?.metal,
@@ -54,27 +56,6 @@ const WatcherModal = forwardRef<WatcherModalHandle, {}>((props, ref) => {
     function handleClose() {
         setOpen(false);
         form.resetFields();
-    }
-
-    const [fundList, setFundList] = useState<{code: string, name: string}[]>([]);
-    async function getFundList() {
-        try {
-            const data: {code: string, name: string}[] = [];
-            const result = await Promise.allSettled([
-                window.electron.ipcRenderer.invoke('get-hold-fund'),
-                window.electron.ipcRenderer.invoke('get-self-selected-fund'),
-            ]);
-            result.forEach(i => {
-                if(i.status === 'rejected' || !i.value) return;
-                i.value.forEach((c: (typeof data)[number]) => {
-                    if(data.find(f => f.code === c.code)) return;
-                    data.push(c);
-                });
-            });
-            setFundList(data);
-        } catch(e) {
-            console.error(e);
-        }
     }
     
     return <Modal
@@ -95,25 +76,14 @@ const WatcherModal = forwardRef<WatcherModalHandle, {}>((props, ref) => {
                 </Form.Item>
                 <Form.Item name="metal" label="有色选择">
                     <Checkbox.Group className='metal-check-box'>
-                        <Checkbox value="au">
-                            现货黄金
-                        </Checkbox>
-                        <Checkbox value="aums">
-                            民生黄金
-                        </Checkbox>
-                        <Checkbox value="aum">
-                            沪金主力
-                        </Checkbox>
-                        <Checkbox value="ag">
-                            现货白银
-                        </Checkbox>
+                        {METAL_OPTIONS.map(i => <Checkbox value={i.value}>{i.label}</Checkbox>)}
                     </Checkbox.Group>
                 </Form.Item>
                 <Form.Item name="fund" label="基金选择">
                     <Checkbox.Group className='metal-check-box fund'>
                         {fundList.map(i => (
-                            <Checkbox value={i.code}>
-                                {i.name}
+                            <Checkbox value={i.value}>
+                                {i.label}
                             </Checkbox>
                         ))}
                     </Checkbox.Group>

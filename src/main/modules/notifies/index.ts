@@ -1,18 +1,13 @@
-import { Notification } from 'electron';
-import { injectable, postConstruct } from 'inversify';
+import { Container, Factory } from 'inversify';
+import { Notifies } from './main';
+import { NotifyMessage, NotifyMessageFactory } from './message';
 
-@injectable()
-export class Notifies {
-    @postConstruct()
-    protected init() {
+export function bindNotifiesProcess(container: Container) {
+    container.bind(Notifies).toSelf().inSingletonScope();
 
-    }
+    container.bind(NotifyMessage).toSelf().inTransientScope();
 
-    public test() {
-        new Notification({
-            title: 'test',
-            body: '这是一段文本',
-            sound: 'ping'
-        }).show();
-    }
+    container.bind<Factory<NotifyMessage>>(NotifyMessageFactory).toFactory((context) => {
+        return () => context.get(NotifyMessage);
+    });
 }

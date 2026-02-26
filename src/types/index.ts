@@ -18,6 +18,16 @@ export interface MetalItemData extends CompositeData {
 export type MetalType = 'au' | 'ag' | 'aum' | 'aums'
 export type MetalData = Record<MetalType, MetalItemData>
 
+
+// 记录消息数据格式
+export interface NotificationData {
+    code: string
+    name: string
+    type: 'timer' | 'amplitude' // 定时器 或者 震幅 模式
+    timer?: number // 定时器时间
+    threshold: number
+}
+
 export interface StorageData {
     interval: number
     fundSource: 0 | 1 // 全局数据源
@@ -26,6 +36,7 @@ export interface StorageData {
         metal: MetalType[] // 有色盯盘项
         fund: string[] // 基金盯盘项
     }
+    notifies: NotificationData[]
     holdFundsSource: Record<string, 0 | 1>
     selfSelectedFundsSource: Record<string, 0 | 1>
 }

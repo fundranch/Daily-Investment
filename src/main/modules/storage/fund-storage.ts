@@ -14,10 +14,11 @@ export class StorageModule {
 
     public data: StorageData | null = {
         holdFundsSource: {},
+        notifies: [],
         watcher: {
             open: false,
             fund: [],
-            metal: ['aums']
+            metal: []
         },
         interval: 5000,
         fundSource: 1,
@@ -48,6 +49,15 @@ export class StorageModule {
             };
             const res = await this.setAppData(newData);
             this.eventBus.emit('watcher-date-update', newData.watcher);
+            return res;
+        });
+        ipcMain.handle('set-notifies-data', async (event, data) => {
+            const newData: StorageData = {
+                ...this.data!,
+                notifies: data
+            };
+            const res = await this.setAppData(newData);
+            this.eventBus.emit('notifies-data-update', newData.notifies);
             return res;
         });
     }

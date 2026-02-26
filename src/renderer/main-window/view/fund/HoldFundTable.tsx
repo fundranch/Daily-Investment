@@ -131,7 +131,6 @@ export function HoldFundTable() {
     ];
 
     const tableData = useFundStore(state => state.holdFunds);
-    console.log(tableData);
 
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [scroll, setScroll] = useState<{x: number, y: number}>({} as any);

@@ -5,6 +5,7 @@ import { useRef, ComponentRef } from 'react';
 import { SettingModal } from './modal/setting';
 import ICON from '../../../../../assets/icon.png';
 import { WatcherModal } from './modal/Watcher';
+import { NotificationModal } from './modal/Notification';
 
 const Wrapper = styled.div`
     display: flex;
@@ -45,6 +46,7 @@ const Wrapper = styled.div`
 export function Title() {
     const settingModalRef = useRef<ComponentRef<typeof SettingModal>>(null);
     const watcherModalRef = useRef<ComponentRef<typeof WatcherModal>>(null);
+    const notificationModal = useRef<ComponentRef<typeof NotificationModal>>(null);
 
     function handleOpenSetting() {
         settingModalRef.current?.open();
@@ -52,6 +54,10 @@ export function Title() {
 
     function handleOpenWatcher() {
         watcherModalRef.current?.open();
+    }
+
+    function handleOpenNotification() {
+        notificationModal.current?.open();
     }
 
     return <Wrapper>
@@ -63,7 +69,7 @@ export function Title() {
             <Button shape="round" size='middle' icon={<SettingOutlined />} onClick={handleOpenSetting}>
                 设置
             </Button>
-            <Button shape="round" color='gold' size='middle' icon={<AlertOutlined />} onClick={handleOpenWatcher} variant="solid">
+            <Button shape="round" color='gold' size='middle' icon={<AlertOutlined />} onClick={handleOpenNotification} variant="solid">
                 通知
             </Button>
             <Button shape="round" type='primary' size='middle' icon={<LineChartOutlined />} onClick={handleOpenWatcher}>
@@ -72,5 +78,6 @@ export function Title() {
         </div>
         <SettingModal ref={settingModalRef}/>
         <WatcherModal ref={watcherModalRef} />
+        <NotificationModal ref={notificationModal} />
     </Wrapper>;
 }
