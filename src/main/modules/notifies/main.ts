@@ -48,6 +48,15 @@ export class Notifies {
         });
     }
 
+    public removeNotifiesByCode(code: string) {
+        const target = this.codeMap.get(code);
+        if(!target) return;
+        target.forEach(notify => {
+            notify.dispose();
+        });
+        this.codeMap.delete(code);
+    }
+
     private reset() {
         this.codeMap.clear();
     }

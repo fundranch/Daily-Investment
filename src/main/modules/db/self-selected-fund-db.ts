@@ -2,18 +2,24 @@ import { inject, injectable, postConstruct } from 'inversify';
 import { ipcMain } from 'electron';
 import { DbService } from './db';
 import { SelfSelectedFundDb } from '../../../types/db';
+import { handleFundEstimateDataSource_0, handleFundEstimateDataSource_1 } from '../polling-scheduler/utils';
+import { BaseDbHandler } from './base-db-handler';
+import { StorageModule } from '../storage/fund-storage';
+import { Notifies } from '../notifies/main';
 import { SYMBOLS } from '../../symbols';
 import { EventBus } from '../events';
-import { StorageModule } from '../storage/fund-storage';
-import { handleFundEstimateDataSource_0, handleFundEstimateDataSource_1 } from '../polling-scheduler/utils';
 
 @injectable()
-export class SelfSelectedFundDbService {
+export class SelfSelectedFundDbService extends BaseDbHandler {
     @inject(DbService) protected dbService: DbService;
 
-    @inject(StorageModule) private storage: StorageModule;
-
-    @inject(SYMBOLS.EventBus) eventBus: EventBus;
+    constructor(
+        @inject(StorageModule) protected storage: StorageModule,
+        @inject(Notifies) protected notifies: Notifies,
+        @inject(SYMBOLS.EventBus) protected eventBus: EventBus
+    ) {
+        super(storage, notifies, eventBus);
+    }
 
     @postConstruct()
     init() {
@@ -73,6 +79,12 @@ export class SelfSelectedFundDbService {
             const result = this.dbService.db.prepare(`
                 DELETE FROM self_selected_funds WHERE code = ?
             `).run(code);
+            // 刷新调度器
+            if(result.changes !== 0) {
+                this.eventBus.emit('polling-scheduler-restart');
+            }
+            // 处理删除基金后的相关副作用
+            this.clearFundEffect(code);
             return result.changes !== 0;
         } catch(e) {
             return false;
