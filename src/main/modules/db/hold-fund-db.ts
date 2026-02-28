@@ -3,7 +3,7 @@ import { ipcMain } from 'electron';
 import dayjs from 'dayjs';
 import { DbService } from './db';
 import { HoldFundDb } from '../../../types/db';
-import { handleFundEstimateDataSource_0, handleFundEstimateDataSource_1 } from '../polling-scheduler/utils';
+import { handleFundEstimateDataSource_0 } from '../polling-scheduler/utils';
 import { BaseDbHandler } from './base-db-handler';
 import { SYMBOLS } from '../../symbols';
 import { Notifies } from '../notifies/main';
@@ -47,9 +47,6 @@ export class HoldFundDbService extends BaseDbHandler {
     }
 
     private getSource(code: string) {
-        if(this.storage.data?.fundSource === 1) {
-            return `https://fundgz.1234567.com.cn/js/${code}.js?rt=1589463125600`;
-        }
         return `https://m.dayfund.cn/ajs/ajaxdata.shtml?showtype=getfundvalue&fundcode=${code}`;
     } 
 
@@ -58,8 +55,7 @@ export class HoldFundDbService extends BaseDbHandler {
         try {
             // 获取当前的最新净值
             const result = await fetch(this.getSource(data.code));
-            const handleFunc = this.storage.data?.fundSource === 1 ? handleFundEstimateDataSource_1 : handleFundEstimateDataSource_0;
-            const handleData = await handleFunc(result);
+            const handleData = await handleFundEstimateDataSource_0(result);
             this.dbService.db.prepare(`
                 INSERT INTO holding_funds
                 (code, name, added_at, invested_amount, total_profit, net, total_profit_update)

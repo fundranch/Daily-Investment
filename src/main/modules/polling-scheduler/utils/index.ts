@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { BaseFundData } from '../../../../types';
 
 export function handleMetalApiData(target: string) {
@@ -54,6 +55,24 @@ export async function handleFundEstimateDataSource_1(target: Response) : Promise
         console.log('eeeee', e);
         return null;
     }
+}
+
+// 数据修正，主要用于天天基金网估算净值延后导致数据推迟的问题
+export function correctNetData(
+    data: Partial<BaseFundData> | null,
+    correct?: {code: string, net: string, time: string, change: string}
+): Partial<BaseFundData> {
+    if(!data || !correct) return data!;
+    if(dayjs(data.estimateTime).isAfter(dayjs(correct.time), 'day')) return data;
+    return {
+        ...data,
+        netTime: correct.time,
+        net: String(correct.net),
+        estimateNet: String(correct.net),
+        estimateTime: correct.time,
+        updateTime: '15:00',
+        estimateChange: correct.change
+    };
 }
 
 // 获取状态

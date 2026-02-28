@@ -5,9 +5,10 @@ import { SYMBOLS } from '../../../symbols';
 import { SelfSelectedFundDb } from '../../../../types/db';
 import { SelfSelectedFundDbService } from '../../db/self-selected-fund-db';
 import { StorageModule } from '../../storage/fund-storage';
-import { getFundStatus, handleFundEstimateDataSource_0, handleFundEstimateDataSource_1 } from '../utils';
+import { correctNetData, getFundStatus, handleFundEstimateDataSource_0, handleFundEstimateDataSource_1 } from '../utils';
 import { BaseFundData } from '../../../../types';
 import { HoldFundApi } from './hold-fund';
+import { NetScheduler } from '../../scheduler/net-scheduler';
 
 @injectable()
 export class SelfSelectedFundApi extends BaseApiFetcher {
@@ -16,6 +17,8 @@ export class SelfSelectedFundApi extends BaseApiFetcher {
     @inject(HoldFundApi) private holdFundApi: HoldFundApi;
 
     @inject(StorageModule) private storage: StorageModule;
+
+    @inject(NetScheduler) private netScheduler: NetScheduler;
 
     constructor(
         @inject(SYMBOLS.MainBrowserFactory) mainBrowserFactory: () => BrowserWindow,
@@ -69,7 +72,10 @@ export class SelfSelectedFundApi extends BaseApiFetcher {
         for(const item of data) {
             if(item.status === 'rejected') continue;
             const handleFunc = this.storage.data?.fundSource === 1 ? handleFundEstimateDataSource_1 : handleFundEstimateDataSource_0;
-            const handleData = await handleFunc(item.value.response);
+            const responseData = await handleFunc(item.value.response);
+            const handleData = this.storage.data?.fundSource === 1
+                ? correctNetData(responseData, this.netScheduler.netsData.get(item.value.code!))
+                : responseData;
             if(!handleData) continue;
             dataMap.set(item.value.code!, handleData);
         }

@@ -10,6 +10,7 @@ import { MenuBuilder } from './modules/menu';
 import { MainWindow } from './modules/browser-window';
 import { WatcherWindow } from './modules/browser-window/watcher';
 import { bindNotifiesProcess } from './modules/notifies';
+import { bindSchedulerProcess } from './modules/scheduler';
 
 export const container = new Container();
 
@@ -38,3 +39,5 @@ bindNotifiesProcess(container);
 bindPollingProcess(container);
 
 bindDbProcess(container);
+
+bindSchedulerProcess(container);

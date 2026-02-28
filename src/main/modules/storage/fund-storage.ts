@@ -65,6 +65,7 @@ export class StorageModule {
     public async initAppData() {
         await this.getAppData();
         this.updateSettingDataEmitter();
+        this.eventBus.emit('on-after-storage-init');
     }
 
     public getFilePath() {

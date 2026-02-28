@@ -4,18 +4,21 @@ import { BaseApiFetcher, Options } from './base-api-fetcher';
 import { SYMBOLS } from '../../../symbols';
 import { HoldFundDb } from '../../../../types/db';
 import { StorageModule } from '../../storage/fund-storage';
-import { getFundStatus, handleFundEstimateDataSource_0, handleFundEstimateDataSource_1 } from '../utils';
+import { correctNetData, getFundStatus, handleFundEstimateDataSource_0, handleFundEstimateDataSource_1 } from '../utils';
 import { BaseFundData } from '../../../../types';
 import { HoldFundDbService } from '../../db/hold-fund-db';
 import { EventBus } from '../../events';
+import { NetScheduler } from '../../scheduler/net-scheduler';
 
 @injectable()
 export class HoldFundApi extends BaseApiFetcher {
-    @inject(SYMBOLS.EventBus) eventBus: EventBus;
+    @inject(SYMBOLS.EventBus) private eventBus: EventBus;
 
     @inject(HoldFundDbService) private db: HoldFundDbService;
 
     @inject(StorageModule) private storage: StorageModule;
+
+    @inject(NetScheduler) private netScheduler: NetScheduler;
 
     constructor(
         @inject(SYMBOLS.MainBrowserFactory) mainBrowserFactory: () => BrowserWindow,
@@ -71,7 +74,10 @@ export class HoldFundApi extends BaseApiFetcher {
         for(const item of data) {
             if(item.status === 'rejected') continue;
             const handleFunc = this.storage.data?.fundSource === 1 ? handleFundEstimateDataSource_1 : handleFundEstimateDataSource_0;
-            const handleData = await handleFunc(item.value.response);
+            const responseData = await handleFunc(item.value.response);
+            const handleData = this.storage.data?.fundSource === 1
+                ? correctNetData(responseData, this.netScheduler.netsData.get(item.value.code!))
+                : responseData;
             if(!handleData) continue;
             dataMap.set(item.value.code!, handleData);
             this.db.updateTotalProfit(item.value.code!, handleData.net as any, handleData.netTime!);
