@@ -40,7 +40,7 @@ export class WatcherWindow {
 
 
     private createWindow() {
-        return new BrowserWindow({
+        const win = new BrowserWindow({
             show: false,
             frame: false,
             resizable: false,
@@ -59,6 +59,11 @@ export class WatcherWindow {
                     : path.join(__dirname, '../../.erb/dll/preload.js'),
             }
         });
+        win.setAlwaysOnTop(true, 'screen-saver'); 
+        win.setVisibleOnAllWorkspaces(true, {
+            visibleOnFullScreen: true,
+        });
+        return win;
     }
 
     public resizeWindow(config: StorageData['watcher']) {
