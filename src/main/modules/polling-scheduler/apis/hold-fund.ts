@@ -45,9 +45,7 @@ export class HoldFundApi extends BaseApiFetcher {
     }
 
     public async fetch({ clean }: Options) {
-        if(clean) {
-            this.dbData = this.db.getAllFunds();
-        }
+        this.dbData = this.db.getAllFunds();
         super.fetch();
         try {
             if(!this.dbData.length) return;
@@ -76,6 +74,7 @@ export class HoldFundApi extends BaseApiFetcher {
             const handleData = await handleFunc(item.value.response);
             if(!handleData) continue;
             dataMap.set(item.value.code!, handleData);
+            this.db.updateTotalProfit(item.value.code!, handleData.net as any, handleData.netTime!);
         }
         return this.dbData.map(i => {
             const mapData = dataMap.get(i.code);

@@ -77,10 +77,10 @@ export class MetalApi extends BaseApiFetcher {
             this.watcherBrowser?.webContents.send('metal-data-update', data);
             this.watcherBrowser?.webContents.send('metal-data-update', data);
             this.eventBus.emit('message-data-update', {
-                au: parseFloat(data.au.ratio),
-                ag: parseFloat(data.ag.ratio),
-                aum: parseFloat(data.aum.ratio),
-                aums: parseFloat(data.aums.ratio)
+                au: parseFloat(data.au?.ratio),
+                ag: parseFloat(data.ag?.ratio),
+                aum: parseFloat(data.aum?.ratio),
+                aums: parseFloat(data.aums?.ratio)
             });
         } catch(e) { console.error(e); }
     }

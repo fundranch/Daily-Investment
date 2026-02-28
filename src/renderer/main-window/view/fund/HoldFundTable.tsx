@@ -93,8 +93,7 @@ export function HoldFundTable() {
             align: 'right',
             width: 90,
             render(value, record) {
-                // TODO 优化金额运算规则
-                return <ValueColumns status={0} value={`${value}元`} time={`最新：${Number(value) + Number(record.todayProfit)}元`} />;
+                return <ValueColumns status={value} value={`${value}元`} time={`最新：${Number(value) + Number(record.todayProfit)}元`} />;
             }
         },
         {
@@ -104,7 +103,6 @@ export function HoldFundTable() {
             align: 'right',
             width: 90,
             render(value, record) {
-                // TODO 优化金额运算规则
                 return <ValueColumns status={0} value={`${value}元`} time={`最新：${Number(value) + Number(record.todayProfit)}元`} />;
             }
         },
@@ -125,7 +123,7 @@ export function HoldFundTable() {
             align: 'right',
             width: 80,
             render(value, record) {
-                return <ValueColumns status={record.status} value={value} time={record.netTime} />;
+                return <ValueColumns status={0} value={value} time={record.netTime} />;
             }
         }
     ];

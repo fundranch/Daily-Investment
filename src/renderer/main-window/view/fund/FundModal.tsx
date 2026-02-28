@@ -116,10 +116,10 @@ const FundModal = forwardRef<FundModalHandle>((props, ref) => {
                 {openType === 'hold' && 
                     <>
                         <Form.Item label="持有金额" name='invested_amount'>
-                            <InputNumber width='100%' controls={false} defaultValue={0} disabled />
+                            <InputNumber width='100%' controls={false} defaultValue={0} />
                         </Form.Item>
                         <Form.Item label="持有收益" name='total_profit'>
-                            <InputNumber width='100%' controls={false} defaultValue={0} disabled />
+                            <InputNumber width='100%' controls={false} defaultValue={0} />
                         </Form.Item>
                     </>}
             </Form>
