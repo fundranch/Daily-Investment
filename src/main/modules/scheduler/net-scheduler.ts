@@ -46,7 +46,6 @@ export class NetScheduler {
                 if(i.status === 'rejected' || !i.value) return;
                 this.netsData.set(i.value.code, i.value);
             });
-            console.log('----', this.netsData);
         } catch(e) {
             console.error(e);
         }
