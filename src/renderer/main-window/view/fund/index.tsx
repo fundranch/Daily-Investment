@@ -55,6 +55,9 @@ export function Fund() {
         window.electron.ipcRenderer.on('hold-fund-update', (data: any) => {
             setHoldFunds(data);
         });
+        window.electron.ipcRenderer.on('update-hold-fund', (data: any) => {
+            fundModalRef.current?.open('hold', data);
+        });
     }, []);
 
 

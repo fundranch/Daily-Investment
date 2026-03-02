@@ -32,17 +32,6 @@ const Wrapper = styled.div`
             flex: 0 0 25px;
             height: 25px;
         }
-        .ant-btn {
-            -webkit-app-region: no-drag !important;
-        }
-        .anticon {
-            flex: 0 0 10px;
-            padding: 5px;
-            color: #333;
-            &:hover {
-                cursor: pointer;
-            }
-        }
         border-bottom: 1px solid #e9e9e9;
     }
 `;

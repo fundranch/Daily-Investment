@@ -12,7 +12,8 @@ export type Channels = 'hide-watcher-title'
     | 'self-selected-fund-update'
     | 'hold-fund-update'
     | 'browser-context-menu'
-    | 'update-setting-data';
+    | 'update-setting-data'
+    | 'update-hold-fund'; // 更新持有基金
 
 export type InvokeChannels = 'set-watcher-data'
     | 'set-notifies-data'

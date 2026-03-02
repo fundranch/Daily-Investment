@@ -143,7 +143,7 @@ export function HoldFundTable() {
     function handleContextMenu(e: any, record: DataType) {
         e.stopPropagation();
         if(!record.code) return;
-        window.electron.ipcRenderer.sendMessage('browser-context-menu', 'hold-fund', { code: record.code });
+        window.electron.ipcRenderer.sendMessage('browser-context-menu', 'hold-fund', record);
     }
 
     function handleGetSummary(data: readonly DataType[]) {

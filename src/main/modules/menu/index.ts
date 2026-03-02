@@ -84,7 +84,7 @@ export class MenuBuilder {
             {
                 label: '更新持有',
                 click: () => {
-                    // TODO
+                    this.mainWindow.webContents.send('update-hold-fund', options);
                 }
             },
             {

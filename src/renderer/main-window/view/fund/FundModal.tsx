@@ -2,7 +2,8 @@ import { Form, InputNumber, Modal, Select, Spin } from 'antd';
 import { debounce } from 'lodash';
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { useFundStore } from '../../store/fund';
+import { useFundStore, HoldFund } from '../../store/fund';
+
 
 
 const Wrapper = styled.div`
@@ -21,25 +22,34 @@ const Wrapper = styled.div`
 `;
 
 interface FundModalHandle {
-    open: (type: 'hold' | 'self-selected') => void
+    open: (type: 'hold' | 'self-selected', data?: HoldFund) => void
 }
 
 interface FormData {
     name: Record<'label' | 'value', string>
-    holdPirce: number // 金额
-    holdIncome: number
+    invested_amount: number // 金额
+    total_profit: number
 }
 
 const FundModal = forwardRef<FundModalHandle>((props, ref) => {
     const [openType, setOpenType] = useState<'hold' | 'self-selected' | null>(null);
-
-    useImperativeHandle(ref, () => ({
-        open(type: 'hold' | 'self-selected') {
-            setOpenType(type);
-        }
-    }));
+    const [isEdit, setEdit] = useState(false);
+    const title = `${isEdit ? '编辑' : '新增'}${openType === 'hold' ? '持有' : '自选'}`;
 
     const [form] = Form.useForm<FormData>();
+
+
+    useImperativeHandle(ref, () => ({
+        open(type: 'hold' | 'self-selected', data?: HoldFund) {
+            setOpenType(type);
+            setEdit(!!data);
+            form.setFieldsValue({
+                name: data ? { label: data.name, value: data.code } : undefined,
+                invested_amount: data?.invested_amount || 0,
+                total_profit: data?.total_profit || 0
+            });
+        }
+    }));
 
     const [isSearch, setSearch] = useState(false);
 
@@ -61,7 +71,7 @@ const FundModal = forwardRef<FundModalHandle>((props, ref) => {
         try {
             await form.validateFields();
             const formData = form.getFieldsValue();
-            const res = await window.electron.ipcRenderer.invoke(`change-${openType}-fund` as any, 'add', {
+            const res = await window.electron.ipcRenderer.invoke(`change-${openType}-fund` as any, isEdit ? 'update' : 'add', {
                 ...formData,
                 code: formData.name.value,
                 name: formData.name.label
@@ -93,12 +103,12 @@ const FundModal = forwardRef<FundModalHandle>((props, ref) => {
         classNames={{ root: 'fund-modal' }}
         open={openType !== null}
         destroyOnHidden
-        title={`新增${openType === 'hold' ? '持有' : '自选'}`}
+        title={title}
         maskClosable={false}
         onCancel={handleClose}
         width={350}
-        okButtonProps={{ size: 'small', disabled: isAdded }}
-        okText={isAdded ? '该基金已加购' : '添加'}
+        okButtonProps={{ size: 'small', disabled: isAdded && !isEdit }}
+        okText={isAdded && !isEdit ? '该基金已加购' : '添加'}
         cancelButtonProps={{ size: 'small' }}
         cancelText="取消"
         onOk={handleConfirm}
@@ -107,6 +117,7 @@ const FundModal = forwardRef<FundModalHandle>((props, ref) => {
             <Form form={form} size='small' layout='vertical' requiredMark={false}>
                 <Form.Item label="基金代码或名称" name="name" rules={[{ required: true, message: '所选基金不得为空' }]}>
                     <Select
+                        disabled={isEdit}
                         labelInValue
                         options={options}
                         notFoundContent={isSearch ? <Spin size="small" /> : '无数据'}
