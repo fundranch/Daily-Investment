@@ -150,11 +150,12 @@ export function HoldFundTable() {
         const num = data.reduce((pre, i) => {
             return pre + Number(i.todayProfit);
         }, 0);
+        const fixNum = Math.round(num * 100) / 100;
         return <Table.Summary fixed>
             <Table.Summary.Row>
                 <Table.Summary.Cell index={0}>当日总计</Table.Summary.Cell>
                 <Table.Summary.Cell index={1} align='right'>
-                    <div style={{ color: getColorByStatus(num) }}>{num}元</div>
+                    <div style={{ color: getColorByStatus(num) }}>{fixNum}元</div>
                 </Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>;
