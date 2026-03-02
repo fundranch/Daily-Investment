@@ -51,7 +51,11 @@ export class HoldFundApi extends BaseApiFetcher {
         this.dbData = this.db.getAllFunds();
         super.fetch();
         try {
-            if(!this.dbData.length) return;
+            if(!this.dbData.length) {
+                this.mainBrowser?.webContents.send('hold-fund-update', []);
+                this.watcherBrowser?.webContents.send('hold-fund-update', []);
+                return;
+            };
             const res = await Promise.allSettled(
                 this.dbData.map(i => this.fetchItem(i.code))
             );

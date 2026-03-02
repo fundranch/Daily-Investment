@@ -53,7 +53,12 @@ export class SelfSelectedFundApi extends BaseApiFetcher {
         }
         super.fetch();
         try {
-            if(!this.dbData.length) return;
+            if(!this.dbData.length) {
+                // 更新渲染进程数据
+                this.mainBrowser?.webContents.send('self-selected-fund-update', []);
+                this.watcherBrowser?.webContents.send('self-selected-fund-update', []);
+                return;
+            };
             const res = await Promise.allSettled(
                 this.dbData.map(i => this.fetchItem(i.code))
             );
