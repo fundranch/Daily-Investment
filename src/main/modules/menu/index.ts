@@ -131,6 +131,19 @@ export class MenuBuilder {
                 }
             ]
         };
+        const subMenuEdit: DarwinMenuItemConstructorOptions = {
+            label: '编辑',
+            submenu: [
+                { label: '剪切', accelerator: 'Command+X', selector: 'cut:' },
+                { label: '复制', accelerator: 'Command+C', selector: 'copy:' },
+                { label: '粘贴', accelerator: 'Command+V', selector: 'paste:' },
+                {
+                    label: '全选',
+                    accelerator: 'Command+A',
+                    selector: 'selectAll:',
+                },
+            ],
+        };
         const subMenuView: DarwinMenuItemConstructorOptions = {
             label: '视图',
             submenu: [
@@ -166,7 +179,7 @@ export class MenuBuilder {
                 }
             ]
         };
-        return [subMenuMain, subMenuView];
+        return [subMenuMain, subMenuEdit, subMenuView];
     }
 
     buildDefaultTemplate() {
