@@ -1,18 +1,24 @@
-## INFO
-看基金和黄金
+<div align="center">
+<img src="./assets/icon.png" alt="小金管家" width="256"/>
 
-## Starting Development
+# 小金管家
 
-Start the app in the `dev` environment:
+**小金管家**—— 一个可以盯盘基金以及黄金涨跌的软件。
 
-```bash
-npm start
-```
+投资有风险，入市需谨慎！
 
-## Packaging for Production
+</div>
 
-To package apps for the local platform:
+## Info
 
-```bash
-npm run package
-```
+所有数据均从开放Api获取，不构成任何投资理财建议。
+
+## Features
+
+本软件具有以下特点：
+
+- 基金实时涨跌，实时数据
+- 黄金实时涨跌，实时数据
+- 基金盈亏估算
+- 基金、黄金浮窗盯盘
+- 基金、黄金提醒设置
