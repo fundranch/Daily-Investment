@@ -6,10 +6,11 @@ import { EventBus } from '../events';
 import { SelfSelectedFundDbService } from '../db/self-selected-fund-db';
 import { HoldFundDbService } from '../db/hold-fund-db';
 import { handleFundEstimateDataSource_0 } from '../polling-scheduler/utils';
+import { Disposable, DisposableManager } from '../disposable-manager';
 
 // 净值调度器，保证基金净值数据更新准确
 @injectable()
-export class NetScheduler {
+export class NetScheduler implements Disposable {
     public readonly netsData = new Map<string, {net: string, time: string, code: string, change: string}>();
 
     @inject(SelfSelectedFundDbService) private selfSelectedDb: SelfSelectedFundDbService;
@@ -22,12 +23,15 @@ export class NetScheduler {
 
     @inject(StorageModule) protected storage: StorageModule;
 
+    @inject(DisposableManager) protected disposableManager: DisposableManager;
+
     @postConstruct()
     protected init() {
         this.scheduledTask = cron.schedule('0 0 9,21 * * 1-5', () => {
             this.collectFundNet();
         });
         this.collectFundNet();
+        this.disposableManager.register(this);
     }
 
     private getSource(code: string) {
@@ -60,5 +64,9 @@ export class NetScheduler {
             time: data?.netTime || '',
             change: data?.estimateChange || ''
         };
+    }
+
+    public dispose(): void {
+        this.scheduledTask.destroy();
     }
 }

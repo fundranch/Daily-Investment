@@ -11,6 +11,7 @@ import { MainWindow } from './modules/browser-window';
 import { WatcherWindow } from './modules/browser-window/watcher';
 import { bindNotifiesProcess } from './modules/notifies';
 import { bindSchedulerProcess } from './modules/scheduler';
+import { DisposableManager } from './modules/disposable-manager';
 
 export const container = new Container();
 
@@ -31,6 +32,8 @@ container.bind<() => BrowserWindow | null>(SYMBOLS.WatcherBrowserFactory)
     .toConstantValue(watcherWindowGetter);
 
 container.bind(MenuBuilder).toSelf().inTransientScope();
+
+container.bind(DisposableManager).toSelf().inSingletonScope();
 
 bindStorageProcess(container);
 

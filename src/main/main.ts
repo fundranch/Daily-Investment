@@ -8,7 +8,7 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { EventEmitter } from 'stream';
@@ -20,6 +20,8 @@ import './modules/api';
 import { StorageData } from '../types';
 import { MainWindow } from './modules/browser-window';
 import { WatcherWindow } from './modules/browser-window/watcher';
+import { DisposableManager } from './modules/disposable-manager';
+import { EventBus } from './modules/events';
 
 class AppUpdater {
     constructor() {
@@ -90,3 +92,9 @@ app.whenReady().then(() => {
         };
     });
 }).catch(console.log);
+
+app.on('before-quit', async () => {
+    ipcMain.removeAllListeners();
+    container.get<EventBus>(SYMBOLS.EventBus).removeAllListeners();
+    container.get(DisposableManager).disposeAll();
+});

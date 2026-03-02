@@ -7,9 +7,10 @@ import { MetalChartApi } from './apis/metal-chart';
 import { StorageModule } from '../storage/fund-storage';
 import { SelfSelectedFundApi } from './apis/self-selected-fund';
 import { HoldFundApi } from './apis/hold-fund';
+import { Disposable, DisposableManager } from '../disposable-manager';
 
 @injectable()
-export class PollingScheduler {
+export class PollingScheduler implements Disposable {
     @inject(CompositeApi) protected compositeApi: CompositeApi;
 
     @inject(MetalApi) protected metalApi: MetalApi;
@@ -22,6 +23,8 @@ export class PollingScheduler {
 
     @inject(HoldFundApi) protected holdFundApi: HoldFundApi;
 
+    @inject(DisposableManager) protected disposableManager: DisposableManager;
+
     @postConstruct()
     init() {
         ipcMain.on('select-chart-type', (event, data) => {
@@ -29,7 +32,7 @@ export class PollingScheduler {
             this.chartTarget = data;
             this.restart();
         });
-        
+        this.disposableManager.register(this);
     }
 
     protected chartTarget: {type: 'metal' | 'fund', key: string } = {
@@ -83,5 +86,9 @@ export class PollingScheduler {
         });
         clearInterval(this.timer);
         this.timer = null;
+    }
+
+    public dispose(): void {
+        this.stop();
     }
 }

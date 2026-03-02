@@ -8,11 +8,11 @@ export interface Disposable {
 export class DisposableManager {
     private disposables = new Set<Disposable>();
 
-    register(disposable: Disposable) {
+    public register(disposable: Disposable) {
         this.disposables.add(disposable);
     }
 
-    unregister(disposable: Disposable) {
+    public unregister(disposable: Disposable) {
         this.disposables.delete(disposable);
     }
 

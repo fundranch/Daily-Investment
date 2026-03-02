@@ -3,9 +3,10 @@ import { SYMBOLS } from '../../symbols';
 import { EventBus } from '../events';
 import { StorageModule } from '../storage/fund-storage';
 import { NotifyMessage, NotifyMessageFactory } from './message';
+import { Disposable, DisposableManager } from '../disposable-manager';
 
 @injectable()
-export class Notifies {
+export class Notifies implements Disposable {
     @inject(SYMBOLS.EventBus) eventBus: EventBus;
 
     @inject(StorageModule) storage: StorageModule;
@@ -15,22 +16,25 @@ export class Notifies {
     // 根据对应的消息生成的map结构便于查找
     private codeMap: Map<string, NotifyMessage[]> = new Map();
 
+     @inject(DisposableManager) protected disposableManager: DisposableManager;
+
     @postConstruct()
-    protected init() {
-        this.start();
-        this.eventBus.on('notifies-data-update', () => {
-            this.reset();
-            this.start();
-        });
-        this.eventBus.on('message-data-update', (data: Record<string, number>) => {
-            Object.keys(data).forEach(code => {
-                const target = this.codeMap.get(code);
-                target?.forEach(notifyMessage => {
-                    notifyMessage.start(data[code]);
-                });
-            });
-        });
-    }
+     protected init() {
+         this.start();
+         this.eventBus.on('notifies-data-update', () => {
+             this.reset();
+             this.start();
+         });
+         this.eventBus.on('message-data-update', (data: Record<string, number>) => {
+             Object.keys(data).forEach(code => {
+                 const target = this.codeMap.get(code);
+                 target?.forEach(notifyMessage => {
+                     notifyMessage.start(data[code]);
+                 });
+             });
+         });
+         this.disposableManager.register(this);
+     }
 
     // 初始化消息系统
     public start() {
@@ -59,5 +63,13 @@ export class Notifies {
 
     private reset() {
         this.codeMap.clear();
+    }
+
+    public dispose(): void {
+        this.codeMap.forEach((value) => {
+            value.forEach(i => {
+                i.dispose();
+            });
+        });
     }
 }
