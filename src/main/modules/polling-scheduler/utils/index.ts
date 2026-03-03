@@ -88,5 +88,5 @@ export function getFundStatus(estimate: any, latest: any): -1 | 0 | 1 {
 
 export function toFixed(num: string | number, fixTo = 2) {
     const fix = Number(Array.from({ length: fixTo }).reduce<string>((pre, i) => `${pre}0`, '1'));
-    return Math.round(Number(num) / fix) * fix;
+    return Math.round(Number(num) * fix) / fix;
 }
