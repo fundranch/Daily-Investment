@@ -4,7 +4,7 @@ import { BaseApiFetcher, Options } from './base-api-fetcher';
 import { SYMBOLS } from '../../../symbols';
 import { HoldFundDb } from '../../../../types/db';
 import { StorageModule } from '../../storage/fund-storage';
-import { correctNetData, getFundStatus, handleFundEstimateDataSource_0, handleFundEstimateDataSource_1 } from '../utils';
+import { correctNetData, getFundStatus, handleFundEstimateDataSource_0, handleFundEstimateDataSource_1, toFixed } from '../utils';
 import { BaseFundData } from '../../../../types';
 import { HoldFundDbService } from '../../db/hold-fund-db';
 import { EventBus } from '../../events';
@@ -90,12 +90,12 @@ export class HoldFundApi extends BaseApiFetcher {
             const mapData = dataMap.get(i.code);
             if(!mapData) return { ...i };
             // 计算当日的收益
-            const total = (i.invested_amount / Number(mapData.estimateNet)) || 0;
-            const todayProfit = (Number(mapData.estimateNet) - Number(mapData.net)) * total;
+            const total = toFixed((i.invested_amount / Number(mapData.estimateNet))) || 0;
+            const todayProfit = toFixed((Number(mapData.estimateNet) - Number(mapData.net)) * total);
             return {
                 ...i,
                 ...mapData,
-                todayProfit: todayProfit.toFixed(2),
+                todayProfit,
                 status: getFundStatus(mapData.estimateNet, mapData.net)
             };
         });

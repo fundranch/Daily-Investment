@@ -6,6 +6,7 @@ import { useResizeObserverDebounce } from '../../hooks/useResizeObserverDebounce
 import { HoldFund, useFundStore } from '../../store/fund';
 import { ValueColumns } from './components/ValueColumns';
 import { COLORS, getColorByStatus } from '../../utils/color';
+import { toFixed } from '../../../../main/modules/polling-scheduler/utils';
 
 type DataType = HoldFund
 
@@ -82,7 +83,7 @@ export function HoldFundTable() {
             align: 'right',
             width: 90,
             render(value, record) {
-                const ratio = ((value / record.invested_amount) * 100 || 0).toFixed(2);
+                const ratio = toFixed((value / record.invested_amount) * 100) || 0;
                 return <ValueColumns status={value} value={`${value}元`} time={`收益率：${ratio}%`} />;
             }
         },

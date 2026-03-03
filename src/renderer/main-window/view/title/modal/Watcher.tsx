@@ -14,6 +14,10 @@ const Wrapper = styled.div`
         flex-direction: column;
         gap: 4px;
     }
+    .fund-choose .ant-form-item-control {
+        max-height: 220px;
+        overflow-y: scroll;
+    }
 `;
 
 interface WatcherModalHandle {
@@ -79,7 +83,7 @@ const WatcherModal = forwardRef<WatcherModalHandle, {}>((props, ref) => {
                         {METAL_OPTIONS.map(i => <Checkbox value={i.value}>{i.label}</Checkbox>)}
                     </Checkbox.Group>
                 </Form.Item>
-                <Form.Item name="fund" label="基金选择">
+                <Form.Item name="fund" label="基金选择" className='fund-choose'>
                     <Checkbox.Group className='metal-check-box fund'>
                         {fundList.map(i => (
                             <Checkbox value={i.value}>
