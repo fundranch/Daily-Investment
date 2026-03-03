@@ -94,7 +94,7 @@ export function HoldFundTable() {
             align: 'right',
             width: 90,
             render(value, record) {
-                return <ValueColumns status={value} value={`${value}元`} time={`最新：${Number(value) + Number(record.todayProfit)}元`} />;
+                return <ValueColumns status={value} value={`${toFixed(value)}元`} time={`最新：${toFixed(Number(value) + Number(record.todayProfit))}元`} />;
             }
         },
         {
@@ -104,7 +104,7 @@ export function HoldFundTable() {
             align: 'right',
             width: 90,
             render(value, record) {
-                return <ValueColumns status={0} value={`${value}元`} time={`最新：${Number(value) + Number(record.todayProfit)}元`} />;
+                return <ValueColumns status={0} value={`${toFixed(value)}元`} time={`最新：${toFixed(Number(value) + Number(record.todayProfit))}元`} />;
             }
         },
         {
