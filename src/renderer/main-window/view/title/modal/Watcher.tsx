@@ -1,4 +1,4 @@
-import { Checkbox, Form, Modal, Switch } from 'antd';
+import { Checkbox, Form, Modal, Slider, Switch } from 'antd';
 import React, { forwardRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useConfigStore } from '../../../store/config';
@@ -25,7 +25,12 @@ interface WatcherModalHandle {
 }
 
 const WatcherModal = forwardRef<WatcherModalHandle, {}>((props, ref) => {
-    const [form] = Form.useForm<{open: boolean, fund: string[], metal: MetalType[]}>();
+    const [form] = Form.useForm<{
+        open: boolean,
+        fund: string[],
+        metal: MetalType[],
+        opacity: number
+    }>();
 
     const configData = useConfigStore(state => state.data);
     const setConfigData = useConfigStore(state => state.setData);
@@ -45,7 +50,8 @@ const WatcherModal = forwardRef<WatcherModalHandle, {}>((props, ref) => {
         form.setFieldsValue({
             open: configData.watcher?.open,
             metal: configData.watcher?.metal,
-            fund: configData.watcher?.fund
+            fund: configData.watcher?.fund,
+            opacity: configData.watcher?.opacity || 1
         });
     }, [configData, open]);
     
@@ -77,6 +83,9 @@ const WatcherModal = forwardRef<WatcherModalHandle, {}>((props, ref) => {
             <Form size='small' form={form} labelCol={{ span: 4 }} labelAlign='left'>
                 <Form.Item name="open" label="小窗盯盘">
                     <Switch />
+                </Form.Item>
+                <Form.Item name="opacity" label="透明度">
+                    <Slider min={0} max={1} step={0.1} style={{ width: '20%' }} />
                 </Form.Item>
                 <Form.Item name="metal" label="有色选择">
                     <Checkbox.Group className='metal-check-box'>

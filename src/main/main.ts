@@ -82,6 +82,8 @@ app.whenReady().then(() => {
             // 根据配置项重新计算window的大小
             container.get<WatcherWindow>(WatcherWindow)?.resizeWindow(data);
         }
+        container.get<WatcherWindow>(WatcherWindow).window?.setOpacity(data.opacity);
+
     });
     app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
@@ -90,6 +92,14 @@ app.whenReady().then(() => {
             // 主弹窗生成
             container.get<MainWindow>(MainWindow)?.create();
         };
+    });
+    ipcMain.on('open-home', () => {
+        const mainWindow = container.get<() => BrowserWindow>(SYMBOLS.MainBrowserFactory)();
+        if(!mainWindow) {
+            container.get<MainWindow>(MainWindow)?.create();
+        } else {
+            mainWindow.show();
+        }
     });
 }).catch(console.log);
 

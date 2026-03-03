@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import './App.css';
 import { useEffect, useState } from 'react';
+import { HomeFilled, HomeOutlined } from '@ant-design/icons';
+// import { Button } from 'antd';
 import { COLORS } from '../main-window/utils/color';
 import ICON from '../../../assets/icon.png';
 import { Watcher } from './view/Watcher';
@@ -32,6 +34,13 @@ const Wrapper = styled.div`
             flex: 0 0 25px;
             height: 25px;
         }
+        .home {
+            cursor: pointer;
+            -webkit-app-region: no-drag;
+            flex: 0 0 25px;
+            color: #d3d3d3;
+            font-size: 15px;
+        }
         border-bottom: 1px solid #e9e9e9;
     }
 `;
@@ -50,11 +59,15 @@ export default function App() {
             setHide(data as any);
         });
     }, []);
+    function handleToHome() {
+        window.electron.ipcRenderer.sendMessage('open-home');
+    }
     return (
         <Wrapper className='watcher-title-wrapper'>
             {!hide && <div className='watcher-title'>
                 <img src={ICON} alt="" />
                 <span className='title'>小金管家</span>
+                <HomeFilled className='home' onClick={handleToHome} />
             </div>}
             <Watcher />
         </Wrapper>
