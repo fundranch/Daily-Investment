@@ -63,7 +63,7 @@ export function correctNetData(
     correct?: {code: string, net: string, time: string, change: string}
 ): Partial<BaseFundData> {
     if(!data || !correct) return data!;
-    if(dayjs(data.estimateTime).isAfter(dayjs(correct.time), 'day')) return data;
+    if(String(correct.time).at(0) === '<' || dayjs(data.estimateTime).isAfter(dayjs(correct.time), 'day')) return data;
     return {
         ...data,
         netTime: correct.time,

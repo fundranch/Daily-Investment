@@ -26,7 +26,7 @@ export class MetalApi extends BaseApiFetcher {
     
     protected get source() {
         const date = new Date();
-        return `https://api.jijinhao.com/quoteCenter/realTime.htm?codes=JO_92233,JO_165732,JO_92232&_=${date.getTime()}}`;
+        return `https://api.jijinhao.com/quoteCenter/realTime.htm?codes=JO_92233,JO_165732,JO_92232&_=${date.getTime()}`;
     }
 
     protected get msSource() {
@@ -66,7 +66,6 @@ export class MetalApi extends BaseApiFetcher {
                         ratio: metalData.raisePercent100,
                         change: metalData.raise,
                         status: this.getStatus(0, metalData.raise),
-                        chartData: metalData.goldChartDataVOS,
                         // TODO 闭市条件
                         isClose: false,
                     };

@@ -20,5 +20,5 @@ body, html, #root {
 .box {
     background-color: #fff;
     padding: 10px;
-    border-radius: 16px;
+    /* border-radius: 16px; */
 }

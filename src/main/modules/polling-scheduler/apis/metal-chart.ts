@@ -3,7 +3,7 @@ import { BrowserWindow } from 'electron';
 import { BaseApiFetcher, Options } from './base-api-fetcher';
 import { SYMBOLS } from '../../../symbols';
 import { handleMetalApiData } from '../utils';
-import { FAKE_HEADERS } from './config';
+import { FAKE_HEADERS, JD_FAKE_HEADERS } from './config';
 
 @injectable()
 export class MetalChartApi extends BaseApiFetcher {
@@ -19,22 +19,20 @@ export class MetalChartApi extends BaseApiFetcher {
         aum: 'JO_165732'
     };
 
-    private getSource(key: 'au' | 'ag' | 'aum') {
+    private getSource(key: 'au' | 'ag' | 'aum' | 'aums') {
+        if(key === 'aums') {
+            return 'https://ms.jr.jd.com/gw2/generic/CreatorSer/pc/m/pcQueryGoldProduct?reqData=%7B%22goldType%22:%221%22%7D';
+        }
         return `https://api.jijinhao.com/sQuoteCenter/todayMin.htm?code=${this.keyMap[key]}`;
     }
 
     public async fetch(options: Options) {
         super.fetch();
-        if(options.key === 'aums') {
-            this.mainBrowser?.webContents.send('chart-data-update', { data: [], key: options.key });
-            return;
-        }
         try {
-            const res = await fetch(this.getSource(options.key as any), { signal: this.abortController?.signal, headers: FAKE_HEADERS });
+            const res = await fetch(this.getSource(options.key as any), { signal: this.abortController?.signal, headers: options.key === 'aums' ? JD_FAKE_HEADERS : FAKE_HEADERS });
             const text = await res.text();
-            const data = handleMetalApiData(text);
             // 更新渲染进程数据
-            this.mainBrowser?.webContents.send('chart-data-update', { data: data.data, key: options.key });
+            this.mainBrowser?.webContents.send('chart-data-update', { key: options.key, info: text });
         } catch(e) {
             console.error(e);
         }

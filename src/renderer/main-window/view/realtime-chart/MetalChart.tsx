@@ -8,6 +8,7 @@ import { COLORS } from '../../utils/color';
 import { useMetalStore } from '../../store/metal';
 import { getBaseOptions } from './options';
 import { useResizeObserverDebounce } from '../../hooks/useResizeObserverDebounce';
+import { handleMetalApiData } from '../../../../main/modules/polling-scheduler/utils';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -43,10 +44,12 @@ export function MetalCharts() {
     }
 
     function initUpdateListener() {
-        window.electron.ipcRenderer.on('chart-data-update', (data: any) => {
+        window.electron.ipcRenderer.on('chart-data-update', ({ key, info }: any) => {
+            if(key === 'aums') return;
+            const data = handleMetalApiData(info)?.data || [];
             let min = Number.MAX_SAFE_INTEGER;
             let max = 0;
-            const chartData: any = data.data.map((i: any) => {
+            const chartData: any = data.map((i: any) => {
                 if(i.price !== -1) {
                     if(i.price > max) {
                         max = i.price;

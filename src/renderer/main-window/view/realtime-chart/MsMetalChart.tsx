@@ -37,41 +37,49 @@ export function MsMetalCharts() {
         return Math[mathType](num / 10) * 10;
     }
 
-    const storeData = useMetalStore(state => state.data.aums);
-
-    useEffect(() => {
-        let min = Number.MAX_SAFE_INTEGER;
-        let max = 0;
-        const chartData: any = storeData?.chartData.map((i: any) => {
-            const [date] = i.value;
-            const price = Number(i.value[1]);
-            if(price !== -1) {
-                if(price > max) {
-                    max = price;
+    function initUpdateListener() {
+        window.electron.ipcRenderer.on('chart-data-update', ({ key, info }: any) => {
+            if(key !== 'aums') return;
+            try {
+                const result = JSON.parse(info);
+                const data = result.resultData?.data?.goldChartDataVOS || [];
+                let min = Number.MAX_SAFE_INTEGER;
+                let max = 0;
+                const chartData: any = data.map((i: any) => {
+                    const [date] = i.value;
+                    const price = Number(i.value[1]);
+                    if(price !== -1) {
+                        if(price > max) {
+                            max = price;
+                        }
+                        if(price < min) {
+                            min = price;
+                        }
+                    }
+                    return [new Date(date), price === -1 ? null : price];
+                });
+                const padding = (max - min) * 0.5;
+                let yAxis: Record<string, number> = {};
+                if(chartData?.length) {
+                    yAxis = {
+                        min: calcYAxisSide(min - padding, 'floor'),
+                        max: calcYAxisSide(max + padding, 'ceil')
+                    };
                 }
-                if(price < min) {
-                    min = price;
-                }
+                chart.current?.setOption({
+                    yAxis: { ...yAxis },
+                    series: [{ name: 'realtime-line', data: chartData || [] }]
+                });
+            } catch(e) {
+                console.error(e);
             }
-            return [new Date(date), price === -1 ? null : price];
         });
-        const padding = (max - min) * 0.5;
-        let yAxis: Record<string, number> = {};
-        if(chartData?.length) {
-            yAxis = {
-                min: calcYAxisSide(min - padding, 'floor'),
-                max: calcYAxisSide(max + padding, 'ceil')
-            };
-        }
-        chart.current?.setOption({
-            yAxis: { ...yAxis },
-            series: [{ name: 'realtime-line', data: chartData || [] }]
-        });
-    }, [storeData?.chartData]);
+    }
 
     useEffect(() => {
         chart.current = echarts.init(wrapperRef.current!);
         chart.current!.setOption(getBaseOptions());
+        initUpdateListener();
     }, []);
 
     useResizeObserverDebounce(wrapperRef, () => {
@@ -85,7 +93,7 @@ export function MsMetalCharts() {
     return <Wrapper>
         <div className='title'>
             {getTitle()}
-            {storeData?.isClose && <Tag color='#108ee9' variant='filled'>休市中</Tag>}
+            {/* <Tag color='#108ee9' variant='filled'>休市中</Tag> */}
         </div>
         <div className='chart' ref={wrapperRef} />
     </Wrapper>;

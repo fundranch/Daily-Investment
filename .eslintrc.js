@@ -27,6 +27,7 @@ module.exports = {
         'camelcase': 'off',
         'no-restricted-syntax': 'off',
         'no-continue': 'off',
+        'no-plusplus': 'off',
         'react/require-default-props': 'off',
         semi: 'error',
         'no-await-in-loop': 'off',
