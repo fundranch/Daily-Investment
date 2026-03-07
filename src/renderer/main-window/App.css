@@ -20,6 +20,9 @@ body, html, #root {
     padding: 10px;
     border-radius: 16px;
 }
-.ant-select, .ant-input-number {
-    font-size: 12px;
+.ant-select, .ant-input-number, .ant-input {
+    font-size: 12px !important;
+}
+:root {
+    --brand-1: #ff4144;
 }

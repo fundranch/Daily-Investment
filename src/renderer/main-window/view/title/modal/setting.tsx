@@ -1,8 +1,9 @@
 import { GetProp, Menu, MenuProps, Modal } from 'antd';
 import React, { forwardRef, useState } from 'react';
 import styled from 'styled-components';
-import { InfoCircleOutlined, SettingOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, RobotOutlined, SettingOutlined } from '@ant-design/icons';
 import { SettingContent } from './SettingContent';
+import { AIContent } from './AIContent';
 
 type MenuItem = GetProp<MenuProps, 'items'>[number];
 
@@ -48,17 +49,25 @@ const SettingModal = forwardRef<SettingModalHandle, {}>((props, ref) => {
             label: '系统设置',
         },
         {
+            key: 'ai-model',
+            icon: <RobotOutlined />,
+            label: '模型设置',
+        },
+        {
             key: 'about',
             icon: <InfoCircleOutlined />,
             label: '关于',
         }
     ];
 
-    const [activeMenu, setActiveMenu] = useState<'setting' | 'about'>('setting');
+    const [activeMenu, setActiveMenu] = useState<'setting' | 'about' | 'ai-model'>('setting');
 
     function getContent() {
         if(activeMenu === 'setting') {
             return <SettingContent setOpen={setOpen} />;
+        } 
+        if(activeMenu === 'ai-model') {
+            return <AIContent setOpen={setOpen} />;
         } 
         return null;
     }

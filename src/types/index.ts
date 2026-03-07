@@ -42,6 +42,11 @@ export interface StorageData {
     selfSelectedFundsSource: Record<string, 0 | 1>
 }
 
+export interface AIStorageData {
+    apiKey: string
+    model: string
+    baseURI: string
+}
 
 export interface BaseFundData {
     key: number;

@@ -1,0 +1,90 @@
+import { injectable } from 'inversify';
+import OpenAI from 'openai';
+// @ts-ignore
+import { v4 } from 'uuid';
+
+type Messages = {_id: string} & OpenAI.Chat.Completions.ChatCompletionMessageParam
+
+// 模型对话层
+@injectable()
+export class ChatSession {
+    private chatMessages: Messages[] = [];
+
+    public get messages() {
+        return [...this.chatMessages];
+    }
+
+    private get MAX_MESSAGES() {
+        return 30;
+    };
+
+    private SYSTEM_PROMPT = `
+        你是一个基金投资助手。
+        你的职责：
+        1. 帮助用户查询基金数据
+        2. 分析收益
+        3. 在需要数据时调用工具
+        4. 在用户允许的情况下删除数据库中的基金数据
+        5. 回答任何问题的时候都不能随意编造
+        6. 你的名字是小金
+
+        当需要查询本地基金时必须调用工具。
+        不要编造基金数据。
+        回答要简洁清晰。
+    `;
+
+    private SYSTEM_SIGNAL: Messages = {
+        _id: v4(),
+        role: 'system',
+        content: this.SYSTEM_PROMPT
+    };
+
+    constructor() {
+        this.chatMessages.push(this.SYSTEM_SIGNAL);
+    }
+
+    public addUserMessage(content: string) {
+        if(!content) return;
+        this.chatMessages.push({
+            _id: v4(),
+            role: 'user',
+            content
+        });
+        this.trim();
+    }
+
+    public addAssistantMessage(content: string) {
+        if(!content) return;
+        this.chatMessages.push({
+            _id: v4(),
+            role: 'assistant',
+            content
+        });
+        this.trim();
+    }
+
+    public addToolMessage(callId: string, toolName: string, content: string) {
+        if(!content) return;
+        this.chatMessages.push({
+            _id: v4(),
+            role: 'tool',
+            tool_call_id: callId,
+            content
+        });
+        this.trim();
+    }
+
+    public clear() {
+        this.chatMessages = [this.SYSTEM_SIGNAL];
+    }
+
+    // 删除多余对话
+    private trim() {
+        if(this.chatMessages.length <= this.MAX_MESSAGES + 1) return;
+        const system = this.chatMessages.find(i => i.role === 'system');
+        const handleMessages = this.chatMessages.slice(-this.MAX_MESSAGES);
+        this.chatMessages = system
+            ? [system, ...this.chatMessages.slice(-this.MAX_MESSAGES)]
+            : handleMessages;
+    }
+}

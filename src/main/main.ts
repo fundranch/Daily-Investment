@@ -22,6 +22,7 @@ import { MainWindow } from './modules/browser-window';
 import { WatcherWindow } from './modules/browser-window/watcher';
 import { DisposableManager } from './modules/disposable-manager';
 import { EventBus } from './modules/events';
+import { McpMain } from './modules/ai/main';
 
 class AppUpdater {
     constructor() {
@@ -63,6 +64,7 @@ app.on('window-all-closed', () => {
 });
 
 app.whenReady().then(() => {
+    container.get<McpMain>(McpMain);
     const eventBus = container.get<EventEmitter>(SYMBOLS.EventBus);
     if(container.isBound(PollingCore)) {
         container.get(PollingCore).initialize();

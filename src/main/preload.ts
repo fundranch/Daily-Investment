@@ -16,6 +16,10 @@ export type Channels = 'hide-watcher-title'
     | 'update-hold-fund' // 更新持有基金
     | 'open-home'
 
+export type AIChannels = 
+    | 'chat-message-change'
+    | 'chat-thinking-status'
+
 export type InvokeChannels = 'set-watcher-data'
     | 'set-notifies-data'
     | 'get-setting-data'
@@ -25,13 +29,17 @@ export type InvokeChannels = 'set-watcher-data'
     | 'change-hold-fund'
     | 'get-self-selected-fund'
     | 'get-hold-fund'
+export type InvokeAIChannels = 'get-ai-model-config'
+    | 'set-ai-model-config'
+    | 'get-ai-messages'
+    | 'add-user-message' 
 
 const electronHandler = {
     ipcRenderer: {
-        sendMessage(channel: Channels, ...args: unknown[]) {
+        sendMessage(channel: Channels | AIChannels, ...args: unknown[]) {
             ipcRenderer.send(channel, ...args);
         },
-        on(channel: Channels, func: (...args: unknown[]) => void) {
+        on(channel: Channels | AIChannels, func: (...args: unknown[]) => void) {
             const subscription = (_event: IpcRendererEvent, ...args: unknown[]) =>
                 func(...args);
             ipcRenderer.on(channel, subscription);
@@ -43,7 +51,7 @@ const electronHandler = {
         once(channel: Channels, func: (...args: unknown[]) => void) {
             ipcRenderer.once(channel, (_event, ...args) => func(...args));
         },
-        async invoke<T = any>(invokeChannels: InvokeChannels, ...args: any[]): Promise<T | null> {
+        async invoke<T = any>(invokeChannels: InvokeChannels | InvokeAIChannels, ...args: any[]): Promise<T | null> {
             try {
                 const res = await ipcRenderer.invoke(invokeChannels, ...args);
                 return res;
