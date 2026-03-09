@@ -35,7 +35,7 @@ export function Bubble(props: Messages) {
     return <Wrapper key={props._id} className={props.role === 'assistant' ? 'ai' : 'person'}>
         { props.role === 'user'
             ? <div className='inner'>{props.content as string}</div>
-            : <div className='inner' dangerouslySetInnerHTML={{ __html: marked.parse(props.content as string) }} />
+            : <div className='inner' dangerouslySetInnerHTML={{ __html: props.content ? marked.parse(props.content as string) : '' }} />
         }
     </Wrapper>;
 }

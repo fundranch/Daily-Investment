@@ -1,13 +1,17 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import OpenAI from 'openai';
 // @ts-ignore
 import { v4 } from 'uuid';
+import { BrowserWindow } from 'electron';
+import { SYMBOLS } from '../../symbols';
 
 type Messages = {_id: string} & OpenAI.Chat.Completions.ChatCompletionMessageParam
 
 // 模型对话层
 @injectable()
 export class ChatSession {
+    @inject(SYMBOLS.MainBrowserFactory) private mainBrowserFactory: () => BrowserWindow;
+
     private chatMessages: Messages[] = [];
 
     public get messages() {
@@ -17,6 +21,10 @@ export class ChatSession {
     private get MAX_MESSAGES() {
         return 30;
     };
+
+    protected get mainWindow() {
+        return this.mainBrowserFactory();
+    }
 
     private SYSTEM_PROMPT = `
         你是一个基金投资助手。
@@ -43,6 +51,11 @@ export class ChatSession {
         this.chatMessages.push(this.SYSTEM_SIGNAL);
     }
 
+    // 更新信息
+    private updateMessages() {
+        this.mainWindow.webContents.send('chat-message-change', this.messages);
+    }
+
     public addUserMessage(content: string) {
         if(!content) return;
         this.chatMessages.push({
@@ -51,6 +64,27 @@ export class ChatSession {
             content
         });
         this.trim();
+        this.updateMessages();
+    }
+
+    // 流式输出支持
+    public startSteamAssistant() {
+        this.chatMessages.push({
+            _id: v4(),
+            role: 'assistant',
+            content: ''
+        });
+    }
+
+    public updateSteamAssistant(content: string) {
+        if(!this.chatMessages.length) return;
+        this.chatMessages[this.chatMessages.length - 1].content = content;
+        this.updateMessages();
+    }
+
+    public removeSteamAssistant() {
+        this.chatMessages.pop();
+        this.updateMessages();
     }
 
     public addAssistantMessage(content: string) {
@@ -59,6 +93,15 @@ export class ChatSession {
             _id: v4(),
             role: 'assistant',
             content
+        });
+        this.trim();
+    }
+
+    public addAssistantCallTool(data: any[]) {
+        this.chatMessages.push({
+            _id: v4(),
+            role: 'assistant',
+            tool_calls: data
         });
         this.trim();
     }

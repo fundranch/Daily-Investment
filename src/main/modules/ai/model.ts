@@ -38,10 +38,6 @@ export class AIModel {
         this.mainWindow.webContents.send('chat-thinking-status', status);
     }
 
-    private updateMessages() {
-        this.mainWindow.webContents.send('chat-message-change', [...this.chatSession.messages]);
-    }
-
     @postConstruct()
     protected init() {
 
@@ -92,9 +88,9 @@ export class AIModel {
         try {
             this.setThinking(true);
             this.chatSession.addUserMessage(content);
-            this.updateMessages();
+            // this.updateMessages();
             await this.runAgentLoop();
-            this.updateMessages();
+            // this.updateMessages();
         } catch(e) {
             console.error('AI error', e);
         } finally {
@@ -110,9 +106,10 @@ export class AIModel {
             count++;
             const message = await this.ask();
             if(!message.tool_calls) {
-                this.chatSession.addAssistantMessage(message.content || '');
+                // this.chatSession.addAssistantMessage(message.content || '');
                 break;
             };
+            this.chatSession.addAssistantCallTool(message.tool_calls);
             for(const toolItme of message.tool_calls) {
                 const toolName = (toolItme as any).function.name;
                 const toolResult = await this.toolCall(
@@ -126,12 +123,54 @@ export class AIModel {
 
     // ai聊天
     private async ask() {
-        const res = await this.openai.chat.completions.create({
+        const stream = await this.openai.chat.completions.create({
             model: this.model!,
             messages: this.chatSession.messages,
             tools: this.tools,
+            stream: true
         });
-        return res.choices[0].message;
+        let content = '';
+        const toolCalls: any[] = [];
+        // 启动流输入
+        this.chatSession.startSteamAssistant();
+        let isClose = false;
+        for await (const chunk of stream) {
+            const delta = chunk.choices?.[0]?.delta;
+            if(delta?.content && !isClose) {
+                content += delta.content;
+                this.chatSession.updateSteamAssistant(content);
+            }
+            // 说明是临时流，直接关闭
+            if(delta.tool_calls && !isClose) {
+                this.chatSession.removeSteamAssistant();
+                isClose = true;
+            }
+            for(const call of delta?.tool_calls || []) {
+                const index = call.index;
+                if(!toolCalls[index]) {
+                    toolCalls[index] = {
+                        id: call.id,
+                        index,
+                        type: call.type,
+                        function: {
+                            name: call.function?.name || '',
+                            arguments: ''
+                        }
+                    };
+                }
+                if(call.function?.arguments) {
+                    toolCalls[index].function.arguments += call.function.arguments;
+                }
+            }
+        }
+        const choice: any = {};
+        if(content) {
+            choice.content = content;
+        }
+        if(toolCalls.length) {
+            choice.tool_calls = toolCalls;
+        }
+        return choice;
     }
 
     // 工具调用

@@ -2,7 +2,9 @@ import { ArrowUpOutlined, LinkOutlined, LoadingOutlined } from '@ant-design/icon
 import { Button, Input } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { debounce } from 'lodash';
 import { Bubble, Messages } from './components/Bubble';
+import { COLORS } from '../../utils/color';
 
 
 const Wrapper = styled.div`
@@ -64,11 +66,12 @@ export const ChatContent = memo(() => {
                 scrollToBottom();
             }
         });
-        window.electron.ipcRenderer.on('chat-message-change', (data: any) => {
+        const handleMessageChange = debounce((data) => {
             if(Array.isArray(data)) {
                 setMessages(data.filter(i => i.role === 'user' || i.role === 'assistant'));
             }
-        });
+        }, 150);
+        window.electron.ipcRenderer.on('chat-message-change', handleMessageChange);
     }, []);
 
     async function getAIMesssages() {
@@ -81,10 +84,10 @@ export const ChatContent = memo(() => {
     const containerRef = useRef<HTMLDivElement>(null);
     function isNearBottom() {
         if(!containerRef.current) return false;
-        return containerRef.current!.scrollHeight - containerRef.current!.scrollTop - containerRef.current!.clientHeight < 10;
+        return containerRef.current!.scrollHeight - containerRef.current!.scrollTop - containerRef.current!.clientHeight < 50;
     }
     useEffect(() => {
-        if(!messages.length || isNearBottom()) return;
+        if(!messages.length || !isNearBottom()) return;
         scrollToBottom();
     }, [messages]);
 
@@ -104,7 +107,7 @@ export const ChatContent = memo(() => {
         <div ref={containerRef} className='body'>
             {!thinking && !messages.length && <div className='empty'>有什么可以帮助您？</div>}
             {messages.map(msg => <Bubble {...msg} />)}
-            {thinking && <div className='thinking'><LoadingOutlined />思考中...</div>}
+            {thinking && <div className='thinking'><LoadingOutlined color={COLORS.win} /></div>}
         </div>
         <div className='tools'>
             <Input.TextArea value={value} onChange={(e) => setValue(e.target.value)} variant='borderless' autoSize={{ minRows: 2, maxRows: 6 }} />
