@@ -15,7 +15,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wzk1583456343/Daily-Investment.git"
+    "url": "git+https://github.com/fundranch/Daily-Investment.git"
   },
   "license": "MIT",
   "author": {
@@ -252,7 +252,7 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "wzk1583456343",
+      "owner": "fundranch",
       "repo": "Daily-Investment"
     }
   },

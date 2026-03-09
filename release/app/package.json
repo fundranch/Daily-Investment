@@ -4,8 +4,8 @@
   "description": "gold&fund",
   "license": "MIT",
   "author": {
-    "name": "kk&&ff",
-    "url": "https://github.com/wzk1583456343"
+    "name": "kk",
+    "url": "https://github.com/fundranch"
   },
   "main": "./dist/main/main.js",
   "scripts": {
