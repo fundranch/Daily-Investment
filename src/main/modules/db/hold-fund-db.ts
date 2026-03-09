@@ -78,7 +78,7 @@ export class HoldFundDbService extends BaseDbHandler {
         }
     }
 
-    private async updateFund(data: HoldFundDb) {
+    public updateFund(data: Partial<HoldFundDb>) {
         try {
             const stmt = this.dbService.db.prepare(`
                 UPDATE holding_funds

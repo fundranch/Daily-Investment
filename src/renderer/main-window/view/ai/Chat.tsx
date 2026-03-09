@@ -70,7 +70,7 @@ export const ChatContent = memo(() => {
             if(Array.isArray(data)) {
                 setMessages(data.filter(i => i.role === 'user' || i.role === 'assistant'));
             }
-        }, 150);
+        }, 80);
         window.electron.ipcRenderer.on('chat-message-change', handleMessageChange);
     }, []);
 
@@ -84,7 +84,7 @@ export const ChatContent = memo(() => {
     const containerRef = useRef<HTMLDivElement>(null);
     function isNearBottom() {
         if(!containerRef.current) return false;
-        return containerRef.current!.scrollHeight - containerRef.current!.scrollTop - containerRef.current!.clientHeight < 50;
+        return containerRef.current!.scrollHeight - containerRef.current!.scrollTop - containerRef.current!.clientHeight < 200;
     }
     useEffect(() => {
         if(!messages.length || !isNearBottom()) return;

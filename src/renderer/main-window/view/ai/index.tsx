@@ -9,6 +9,7 @@ import { COLORS } from '../../utils/color';
 import { ChatContent } from './Chat';
 
 const Title = styled.div`
+    user-select: none;
     color: ${COLORS.win};
     .anticon {
         font-size: 14px;
@@ -20,6 +21,7 @@ const Wrapper = styled.div<{thinking: boolean}>`
     position: relative;
     overflow: hidden;
     border-radius: 6px;
+    outline: none;
     &::before {
         content: '';
         width: 150%;
