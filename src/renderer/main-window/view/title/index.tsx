@@ -1,11 +1,14 @@
 import { AlertOutlined, LineChartOutlined, SettingOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, Popover, Tooltip } from 'antd';
 import styled from 'styled-components';
-import { useRef, ComponentRef } from 'react';
+import { useRef, ComponentRef, useEffect, useState } from 'react';
 import { SettingModal } from './modal/setting';
 import ICON from '../../../../../assets/icon.png';
 import { WatcherModal } from './modal/Watcher';
 import { NotificationModal } from './modal/Notification';
+import { COLORS } from '../../utils/color';
+import { eventBus } from '../../utils/event';
+import { AIChat } from '../ai';
 
 const Wrapper = styled.div`
     display: flex;
@@ -20,6 +23,7 @@ const Wrapper = styled.div`
         justify-content: flex-start;
         position: relative;
         padding-left: 60px;
+        cursor: pointer;
         img {
             position: absolute;
             bottom: -15px;
@@ -60,10 +64,25 @@ export function Title() {
         notificationModal.current?.open();
     }
 
+    const [open, setOpen] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setOpen(false);
+        }, 3000);
+    }, []);
+
+    function handleOpenAI() {
+        setOpen(false);
+        eventBus.emit('open-ai');
+    }
+
     return <Wrapper>
-        <div className='title'>
-            <img src={ICON} alt="" />
-            小金管家
+        <div className='title' onClick={handleOpenAI} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+            <Tooltip placement="right" title='点我可启用小金AI管家' open={open} color={COLORS.win} styles={{ root: { fontSize: 12 } }}>
+                <img src={ICON} alt="" />
+                小金管家
+            </Tooltip>
         </div>
         <div className="tool-list">
             <Button shape="round" size='middle' icon={<SettingOutlined />} onClick={handleOpenSetting}>
@@ -79,5 +98,6 @@ export function Title() {
         <SettingModal ref={settingModalRef}/>
         <WatcherModal ref={watcherModalRef} />
         <NotificationModal ref={notificationModal} />
+        <AIChat />
     </Wrapper>;
 }

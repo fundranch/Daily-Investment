@@ -18,7 +18,8 @@ export class StorageModule {
         watcher: {
             open: false,
             fund: [],
-            metal: []
+            metal: [],
+            opacity: 1
         },
         interval: 5000,
         fundSource: 1,

@@ -22,6 +22,7 @@ import { MainWindow } from './modules/browser-window';
 import { WatcherWindow } from './modules/browser-window/watcher';
 import { DisposableManager } from './modules/disposable-manager';
 import { EventBus } from './modules/events';
+import { McpMain } from './modules/ai/main';
 
 class AppUpdater {
     constructor() {
@@ -63,6 +64,7 @@ app.on('window-all-closed', () => {
 });
 
 app.whenReady().then(() => {
+    container.get<McpMain>(McpMain);
     const eventBus = container.get<EventEmitter>(SYMBOLS.EventBus);
     if(container.isBound(PollingCore)) {
         container.get(PollingCore).initialize();
@@ -82,6 +84,8 @@ app.whenReady().then(() => {
             // 根据配置项重新计算window的大小
             container.get<WatcherWindow>(WatcherWindow)?.resizeWindow(data);
         }
+        container.get<WatcherWindow>(WatcherWindow).window?.setOpacity(data.opacity);
+
     });
     app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
@@ -90,6 +94,14 @@ app.whenReady().then(() => {
             // 主弹窗生成
             container.get<MainWindow>(MainWindow)?.create();
         };
+    });
+    ipcMain.on('open-home', () => {
+        const mainWindow = container.get<() => BrowserWindow>(SYMBOLS.MainBrowserFactory)();
+        if(!mainWindow) {
+            container.get<MainWindow>(MainWindow)?.create();
+        } else {
+            mainWindow.show();
+        }
     });
 }).catch(console.log);
 

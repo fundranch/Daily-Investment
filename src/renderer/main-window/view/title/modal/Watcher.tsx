@@ -1,4 +1,4 @@
-import { Checkbox, Form, Modal, Switch } from 'antd';
+import { Checkbox, Form, Modal, Slider, Switch } from 'antd';
 import React, { forwardRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useConfigStore } from '../../../store/config';
@@ -14,6 +14,10 @@ const Wrapper = styled.div`
         flex-direction: column;
         gap: 4px;
     }
+    .fund-choose .ant-form-item-control {
+        max-height: 220px;
+        overflow-y: scroll;
+    }
 `;
 
 interface WatcherModalHandle {
@@ -21,7 +25,12 @@ interface WatcherModalHandle {
 }
 
 const WatcherModal = forwardRef<WatcherModalHandle, {}>((props, ref) => {
-    const [form] = Form.useForm<{open: boolean, fund: string[], metal: MetalType[]}>();
+    const [form] = Form.useForm<{
+        open: boolean,
+        fund: string[],
+        metal: MetalType[],
+        opacity: number
+    }>();
 
     const configData = useConfigStore(state => state.data);
     const setConfigData = useConfigStore(state => state.setData);
@@ -41,7 +50,8 @@ const WatcherModal = forwardRef<WatcherModalHandle, {}>((props, ref) => {
         form.setFieldsValue({
             open: configData.watcher?.open,
             metal: configData.watcher?.metal,
-            fund: configData.watcher?.fund
+            fund: configData.watcher?.fund,
+            opacity: configData.watcher?.opacity || 1
         });
     }, [configData, open]);
     
@@ -74,12 +84,15 @@ const WatcherModal = forwardRef<WatcherModalHandle, {}>((props, ref) => {
                 <Form.Item name="open" label="小窗盯盘">
                     <Switch />
                 </Form.Item>
+                <Form.Item name="opacity" label="透明度">
+                    <Slider min={0} max={1} step={0.1} style={{ width: '20%' }} />
+                </Form.Item>
                 <Form.Item name="metal" label="有色选择">
                     <Checkbox.Group className='metal-check-box'>
                         {METAL_OPTIONS.map(i => <Checkbox value={i.value}>{i.label}</Checkbox>)}
                     </Checkbox.Group>
                 </Form.Item>
-                <Form.Item name="fund" label="基金选择">
+                <Form.Item name="fund" label="基金选择" className='fund-choose'>
                     <Checkbox.Group className='metal-check-box fund'>
                         {fundList.map(i => (
                             <Checkbox value={i.value}>

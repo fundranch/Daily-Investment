@@ -72,8 +72,10 @@ export class SelfSelectedFundApi extends BaseApiFetcher {
         }   
     }
 
+    // 基金缓存数据，避免数据获取失败时的数据异常
+    private cacheNetMapData = new Map<string, Partial<BaseFundData>>();
+
     private async handleFetchData(data: PromiseSettledResult<{response: Response, code: string}>[]) {
-        const dataMap = new Map<string, Partial<BaseFundData>>();
         for(const item of data) {
             if(item.status === 'rejected') continue;
             const handleFunc = this.storage.data?.fundSource === 1 ? handleFundEstimateDataSource_1 : handleFundEstimateDataSource_0;
@@ -82,10 +84,10 @@ export class SelfSelectedFundApi extends BaseApiFetcher {
                 ? correctNetData(responseData, this.netScheduler.netsData.get(item.value.code!))
                 : responseData;
             if(!handleData) continue;
-            dataMap.set(item.value.code!, handleData);
+            this.cacheNetMapData.set(item.value.code!, handleData);
         }
         return this.dbData.map(i => {
-            const mapData = dataMap.get(i.code);
+            const mapData = this.cacheNetMapData.get(i.code);
             if(!mapData) return { ...i };
             return {
                 ...i,

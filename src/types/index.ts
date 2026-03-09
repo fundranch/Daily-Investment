@@ -35,12 +35,18 @@ export interface StorageData {
         open: boolean
         metal: MetalType[] // 有色盯盘项
         fund: string[] // 基金盯盘项
+        opacity: number // 透明度
     }
     notifies: NotificationData[]
     holdFundsSource: Record<string, 0 | 1>
     selfSelectedFundsSource: Record<string, 0 | 1>
 }
 
+export interface AIStorageData {
+    apiKey: string
+    model: string
+    baseURI: string
+}
 
 export interface BaseFundData {
     key: number;

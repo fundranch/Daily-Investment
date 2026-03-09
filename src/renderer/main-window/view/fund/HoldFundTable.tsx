@@ -6,6 +6,7 @@ import { useResizeObserverDebounce } from '../../hooks/useResizeObserverDebounce
 import { HoldFund, useFundStore } from '../../store/fund';
 import { ValueColumns } from './components/ValueColumns';
 import { COLORS, getColorByStatus } from '../../utils/color';
+import { toFixed } from '../../../../main/modules/polling-scheduler/utils';
 
 type DataType = HoldFund
 
@@ -82,7 +83,7 @@ export function HoldFundTable() {
             align: 'right',
             width: 90,
             render(value, record) {
-                const ratio = ((value / record.invested_amount) * 100 || 0).toFixed(2);
+                const ratio = toFixed((value / record.invested_amount) * 100) || 0;
                 return <ValueColumns status={value} value={`${value}元`} time={`收益率：${ratio}%`} />;
             }
         },
@@ -93,7 +94,7 @@ export function HoldFundTable() {
             align: 'right',
             width: 90,
             render(value, record) {
-                return <ValueColumns status={value} value={`${value}元`} time={`最新：${Number(value) + Number(record.todayProfit)}元`} />;
+                return <ValueColumns status={value} value={`${toFixed(value)}元`} time={`最新：${toFixed(Number(value) + Number(record.todayProfit))}元`} />;
             }
         },
         {
@@ -103,7 +104,7 @@ export function HoldFundTable() {
             align: 'right',
             width: 90,
             render(value, record) {
-                return <ValueColumns status={0} value={`${value}元`} time={`最新：${Number(value) + Number(record.todayProfit)}元`} />;
+                return <ValueColumns status={0} value={`${toFixed(value)}元`} time={`最新：${toFixed(Number(value) + Number(record.todayProfit))}元`} />;
             }
         },
         {
@@ -150,11 +151,12 @@ export function HoldFundTable() {
         const num = data.reduce((pre, i) => {
             return pre + Number(i.todayProfit);
         }, 0);
+        const fixNum = Math.round(num * 100) / 100;
         return <Table.Summary fixed>
             <Table.Summary.Row>
                 <Table.Summary.Cell index={0}>当日总计</Table.Summary.Cell>
                 <Table.Summary.Cell index={1} align='right'>
-                    <div style={{ color: getColorByStatus(num) }}>{num}元</div>
+                    <div style={{ color: getColorByStatus(num) }}>{fixNum}元</div>
                 </Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>;

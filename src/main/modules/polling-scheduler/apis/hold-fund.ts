@@ -4,7 +4,7 @@ import { BaseApiFetcher, Options } from './base-api-fetcher';
 import { SYMBOLS } from '../../../symbols';
 import { HoldFundDb } from '../../../../types/db';
 import { StorageModule } from '../../storage/fund-storage';
-import { correctNetData, getFundStatus, handleFundEstimateDataSource_0, handleFundEstimateDataSource_1 } from '../utils';
+import { correctNetData, getFundStatus, handleFundEstimateDataSource_0, handleFundEstimateDataSource_1, toFixed } from '../utils';
 import { BaseFundData } from '../../../../types';
 import { HoldFundDbService } from '../../db/hold-fund-db';
 import { EventBus } from '../../events';
@@ -73,8 +73,10 @@ export class HoldFundApi extends BaseApiFetcher {
         }   
     }
 
+    // 基金缓存数据，避免数据获取失败时的数据异常
+    private cacheNetMapData = new Map<string, Partial<BaseFundData>>();
+
     private async handleFetchData(data: PromiseSettledResult<{response: Response, code: string}>[]) {
-        const dataMap = new Map<string, Partial<BaseFundData>>();
         for(const item of data) {
             if(item.status === 'rejected') continue;
             const handleFunc = this.storage.data?.fundSource === 1 ? handleFundEstimateDataSource_1 : handleFundEstimateDataSource_0;
@@ -83,19 +85,19 @@ export class HoldFundApi extends BaseApiFetcher {
                 ? correctNetData(responseData, this.netScheduler.netsData.get(item.value.code!))
                 : responseData;
             if(!handleData) continue;
-            dataMap.set(item.value.code!, handleData);
+            this.cacheNetMapData.set(item.value.code!, handleData);
             this.db.updateTotalProfit(item.value.code!, handleData.net as any, handleData.netTime!);
         }
         return this.dbData.map(i => {
-            const mapData = dataMap.get(i.code);
+            const mapData = this.cacheNetMapData.get(i.code);
             if(!mapData) return { ...i };
             // 计算当日的收益
-            const total = (i.invested_amount / Number(mapData.estimateNet)) || 0;
-            const todayProfit = (Number(mapData.estimateNet) - Number(mapData.net)) * total;
+            const total = toFixed((i.invested_amount / Number(mapData.estimateNet))) || 0;
+            const todayProfit = toFixed((Number(mapData.estimateNet) - Number(mapData.net)) * total);
             return {
                 ...i,
                 ...mapData,
-                todayProfit: todayProfit.toFixed(2),
+                todayProfit,
                 status: getFundStatus(mapData.estimateNet, mapData.net)
             };
         });

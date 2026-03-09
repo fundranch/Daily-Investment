@@ -27,6 +27,7 @@ module.exports = {
         'camelcase': 'off',
         'no-restricted-syntax': 'off',
         'no-continue': 'off',
+        'no-plusplus': 'off',
         'react/require-default-props': 'off',
         semi: 'error',
         'no-await-in-loop': 'off',
@@ -64,6 +65,8 @@ module.exports = {
 
         // 块语句的花括号前需要空格
         'space-before-blocks': 'error',
+        'react/no-danger': 'off',
+        'react/no-unstable-nested-components': 'off',
         // 函数声明的函数名和参数列表之间不需要空格
         'space-before-function-paren': [
             'error',

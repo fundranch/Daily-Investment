@@ -1,5 +1,6 @@
 import { injectable } from 'inversify';
 import { Notification } from 'electron';
+import { debounce } from 'lodash';
 import { NotificationData } from '../../../types';
 
 export const NotifyMessageFactory = Symbol.for('MessageFactory');
@@ -40,14 +41,14 @@ export class NotifyMessage {
         }
     }
 
-    private message(value: number) {
-        const text = `实时${value > 0 ? '上涨' : '下跌'}: ${value}%, 请注意`;
+    private message = debounce((value) => {
+        const text = `实时${value > 0 ? '上涨' : '下跌'}: ${value || 0}%, 请注意`;
         new Notification({
             title: this.data.name,
             body: text,
             sound: 'ping'
         }).show();
-    }
+    }, 200);
 
     public dispose() {
         if(this.timer !== null) {

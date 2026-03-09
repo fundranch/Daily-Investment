@@ -12,6 +12,7 @@ import { WatcherWindow } from './modules/browser-window/watcher';
 import { bindNotifiesProcess } from './modules/notifies';
 import { bindSchedulerProcess } from './modules/scheduler';
 import { DisposableManager } from './modules/disposable-manager';
+import { bindAIProcess } from './modules/ai';
 
 export const container = new Container();
 
@@ -42,5 +43,7 @@ bindNotifiesProcess(container);
 bindPollingProcess(container);
 
 bindDbProcess(container);
+
+bindAIProcess(container);
 
 bindSchedulerProcess(container);

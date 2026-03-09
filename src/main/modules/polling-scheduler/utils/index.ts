@@ -15,10 +15,13 @@ export function digitLength(num: number) {
 export async function handleFundEstimateDataSource_0(target: Response): Promise<Partial<BaseFundData> | null> {
     try {
         const text = await target.text();
+        if(text.startsWith('<!DOCTYPE html>')) {
+            return null;
+        }
         const split = text.split('|');
         const netTime = split[0];
         const net = split[1];
-        const estimateTime = split[9];
+        const estimateTime = split[9] === '0000-00-00' ? netTime : split[9];
         const estimateNet = netTime === estimateTime ? net : split[7];
         const estimateChange = netTime === estimateTime ? split[4] : split[5];
         return {
@@ -27,7 +30,7 @@ export async function handleFundEstimateDataSource_0(target: Response): Promise<
             estimateNet, // 预估净值
             estimateChange, // 预估涨跌幅
             estimateTime,
-            updateTime: split[10]
+            updateTime: split[10] === '00:00:00' ? '15:00:00' : split[10]
         };
     } catch(e) {
         return null;
@@ -52,7 +55,6 @@ export async function handleFundEstimateDataSource_1(target: Response) : Promise
             updateTime: timeSplit[1]
         };
     } catch(e) {
-        console.log('eeeee', e);
         return null;
     }
 }
@@ -84,4 +86,9 @@ export function getFundStatus(estimate: any, latest: any): -1 | 0 | 1 {
         return 1;
     }
     return 0;
+}
+
+export function toFixed(num: string | number, fixTo = 2) {
+    const fix = Number(Array.from({ length: fixTo }).reduce<string>((pre, i) => `${pre}0`, '1'));
+    return Math.round(Number(num) * fix) / fix;
 }

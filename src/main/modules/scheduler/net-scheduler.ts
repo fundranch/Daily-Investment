@@ -11,7 +11,7 @@ import { Disposable, DisposableManager } from '../disposable-manager';
 // 净值调度器，保证基金净值数据更新准确
 @injectable()
 export class NetScheduler implements Disposable {
-    public readonly netsData = new Map<string, {net: string, time: string, code: string, change: string}>();
+    public netsData = new Map<string, {net: string, time: string, code: string, change: string}>();
 
     @inject(SelfSelectedFundDbService) private selfSelectedDb: SelfSelectedFundDbService;
 
@@ -34,36 +34,38 @@ export class NetScheduler implements Disposable {
         this.disposableManager.register(this);
     }
 
-    private getSource(code: string) {
-        return `https://m.dayfund.cn/ajs/ajaxdata.shtml?showtype=getfundvalue&fundcode=${code}`;
-    } 
+    private getSource() {
+        return 'https://api.fund.eastmoney.com/favor/GetFundsInfo?';
+    }
 
     private async collectFundNet() {
         const selfSelectedFunds = this.selfSelectedDb.getAllFunds();
         const holdFunds = this.holdDb.getAllFunds();
         try {
-            const results = await Promise.allSettled([
-                ...selfSelectedFunds.map(i => this.fetch(i.code)),
-                ...holdFunds.map(i => this.fetch(i.code)),
-            ]);
-            results.forEach(i => {
-                if(i.status === 'rejected' || !i.value) return;
-                this.netsData.set(i.value.code, i.value);
-            });
+            const params = [...selfSelectedFunds, ...holdFunds].map(i => i.code);
+            const result = await this.fetch(`fcodes=${params.join(',')}`);
+            this.netsData = new Map(result);
         } catch(e) {
             console.error(e);
         }
     }
 
-    private async fetch(code: string) {
-        const result = await fetch(this.getSource(code));
-        const data = await handleFundEstimateDataSource_0(result);
-        return { 
-            code,
-            net: data?.net || '',
-            time: data?.netTime || '',
-            change: data?.estimateChange || ''
-        };
+    private async fetch(codes: string) {
+        const result = await fetch(this.getSource(), {
+            method: 'post',
+            body: codes,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Referer': 'https://favor.fund.eastmoney.com/'
+            }
+        });
+        const data = await result.json();
+        return data?.Data?.KFS?.map((i: any) => [i.FCODE, {
+            code: i.FCODE,
+            net: i.DWJZ || '',
+            time: i.FSRQ || '',
+            change: `${i.RZDF}%` || '',
+        }]) || [];
     }
 
     public dispose(): void {
