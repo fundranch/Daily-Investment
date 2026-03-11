@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 
-async function handleFundSearch(text: string) {
+export async function handleFundSearch(text: string) {
     const api = `https://fundsuggest.eastmoney.com/FundSearch/api/FundSearchAPI.ashx?callback=jQuery183045372119396196975_1772179877427&m=1&key=${text}&_=1772179922461`;
     try {
         const res = await fetch(api);

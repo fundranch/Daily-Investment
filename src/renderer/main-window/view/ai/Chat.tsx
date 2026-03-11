@@ -84,7 +84,7 @@ export const ChatContent = memo(() => {
     const containerRef = useRef<HTMLDivElement>(null);
     function isNearBottom() {
         if(!containerRef.current) return false;
-        return containerRef.current!.scrollHeight - containerRef.current!.scrollTop - containerRef.current!.clientHeight < 200;
+        return containerRef.current!.scrollHeight - containerRef.current!.scrollTop - containerRef.current!.clientHeight < 300;
     }
     useEffect(() => {
         if(!messages.length || !isNearBottom()) return;

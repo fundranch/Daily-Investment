@@ -3,6 +3,14 @@ import path from 'node:path';
 import { app } from 'electron';
 import BetterSqlite3 from 'better-sqlite3';
 
+export type BatchFundData = {
+    type: 'add' | 'update' | 'delete'
+    code: string
+    name: string
+    invested_amount?: number
+    total_profit?: number
+}
+
 @injectable()
 export class DbService {
     public db: BetterSqlite3.Database;

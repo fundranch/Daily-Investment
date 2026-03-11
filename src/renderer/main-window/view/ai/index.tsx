@@ -31,9 +31,9 @@ const Wrapper = styled.div<{thinking: boolean}>`
         transform: translate(-50%, -50%) rotate(0deg);
         transform-origin: center;
         position: absolute;
-        background: ${`conic-gradient(from 0deg, transparent,${COLORS.win},transparent)`};
-        animation: spin ${({ thinking }) => thinking ? 2 : 4}s linear infinite;
-        opacity: ${({ thinking }) => thinking ? 1 : 0.2};
+        background: ${`conic-gradient(from 0deg, transparent ,${COLORS.win}, transparent)`};
+        animation: spin ${({ thinking }) => thinking ? 1 : 4}s linear infinite;
+        opacity: ${({ thinking }) => thinking ? 1 : 0.4};
     } 
     .inner {
         padding: 2px;
