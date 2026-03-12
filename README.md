@@ -31,7 +31,7 @@
 <br />
 
 ### AI智能助手
-<img src="./assets/AI.png" alt="小金管家" width="100%"/>
+<img src="./assets/ai.png" alt="小金管家" width="100%"/>
 - 可通过描述最新数据，让AI更新基金的持有等数据情况；也可通过AI新增或者删除基金。
 <br />
 <br />
