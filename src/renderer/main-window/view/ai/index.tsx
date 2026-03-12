@@ -24,7 +24,7 @@ const Wrapper = styled.div<{thinking: boolean}>`
     outline: none;
     &::before {
         content: '';
-        width: 150%;
+        width: 200%;
         aspect-ratio: 1;  /* 保证是正方形 */
         left: 50%;
         top: 50%;
